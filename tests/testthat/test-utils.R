@@ -1,11 +1,11 @@
-# TODO: test write_md writing in other directories?
-# TODO: test write_md with a more complicated yaml?  Or just assume as.yaml does it's job?
+# TODO: test write_md writing in other directories? Or just assume file.path does its job?
+# TODO: test write_md with a more complicated yaml?  Or just assume as.yaml does its job?
 
 test_that("write_md outputs the expected markdown file", {
   yaml <- list(title="A Test Page")
   content <- "This test file was written by write_md()."
   filename <- "write_md_test.md"
-  output_dir <- withr::local_tempdir(pattern = "write-utf8-nonproject")
+  output_dir <- withr::local_tempdir(pattern = "write_md")
 
   write_md(yaml=yaml, content=content, filename=filename, output_dir=output_dir)
   expect_true(file.exists(file.path(output_dir, filename)))
