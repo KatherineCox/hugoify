@@ -1,4 +1,5 @@
-# TODO: test parse_hugoify_yaml puts things in the right directory
+# TODO: test parse_hugoify_yaml puts things in the right directory if given output_dir
+# TODO: revisit config and theme
 
 
 test_that("parse_hugoify_yaml checks for expected keys", {
@@ -43,5 +44,22 @@ test_that("parse_hugoify_yaml checks for expected keys", {
   writeLines(yaml, yaml_file)
   expect_error(parse_hugoify_yaml(yaml_file), regexp=NA)
 
+})
+
+test_that("parse_hugoify_yaml returns a list of calls", {
+
+  yaml_file <- withr::local_file("hugoify.yml")
+
+  # empty content - should just make the home page
+  yaml <- paste("---", "content:", "config: c", "theme: t", "---", sep="\n")
+  num_pages <- 1
+
+  writeLines(yaml, yaml_file)
+  parse_results <- parse_hugoify_yaml(yaml_file)
+
+  expect_type(parse_results, "list")
+  expect_length(parse_results, num_pages + 2)
+  expect_equal(vapply(parse_results, is.call, TRUE),
+               rep( TRUE, length(parse_results) ))
 })
 

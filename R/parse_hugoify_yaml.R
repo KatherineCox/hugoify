@@ -8,7 +8,7 @@ parse_hugoify_yaml <- function( yaml_file, output_dir=NULL, quiet=FALSE ) {
 
   y <- yaml::yaml.load_file(yaml_file)
 
-  # needs a handler for images, but I haven't written it yet
+  # TODO: needs a handler for images, but I haven't written it yet
   # should be something like:
   # y <- yaml::yaml.load(yaml, handlers = list(img = make_test_image(x)))
 
@@ -31,11 +31,11 @@ parse_hugoify_yaml <- function( yaml_file, output_dir=NULL, quiet=FALSE ) {
     stop("Found both 'content' and 'home' keys in hugoify yaml config.\n",
          "hugoify must have either 'content' or 'home' but not both.")
   } else if (content) {
-    #calls <- construct_page_calls( y[["content"]],
-    #                               output_dir=file.path(output_dir, "content"))
+    calls <- construct_page_calls( y[["content"]],
+                                   output_dir=file.path(output_dir, "content"))
   } else if (home) {
-    #calls <- construct_page_calls( y[["home"]],
-    #                               output_dir=file.path(output_dir, "content"))
+    calls <- construct_page_calls( y[["home"]],
+                                   output_dir=file.path(output_dir, "content"))
   } else {
     stop("No site content found.\n",
          "hugoify yaml config must have a 'content' or 'home' key.")
@@ -47,9 +47,10 @@ parse_hugoify_yaml <- function( yaml_file, output_dir=NULL, quiet=FALSE ) {
       warning("No hugo config file specified.")
     }
   } else {
-  #   #calls[[length(calls) + 1]] <- file.copy(y[["config"]],
-  #                                               #destination,
-  #                                               #recursive=TRUE)
+    calls[[length(calls) + 1]] <- call( "file.copy",
+                                        from = y[["config"]],
+                                        to = output_dir,
+                                        recursive=TRUE)
   }
 
   if ( is.null(y[["theme"]]) ) {
@@ -58,14 +59,19 @@ parse_hugoify_yaml <- function( yaml_file, output_dir=NULL, quiet=FALSE ) {
       warning("No hugo theme directory specified.")
     }
   } else {
-  #   #calls[[length(calls) + 1]] <- file.copy(y[["theme"]],
-  #   #destination,
-  #   #recursive=TRUE)
+    calls[[length(calls) + 1]] <- call( "file.copy",
+                                        from = y[["theme"]],
+                                        to = output_dir,
+                                        recursive=TRUE)
   }
 
   calls
 }
 
-construct_page_calls <- function() {
+construct_page_calls <- function( yaml_list, output_dir = "." ) {
 
+  # make an empty list to hold output
+  page_calls <- list()
+
+  page_calls
 }
