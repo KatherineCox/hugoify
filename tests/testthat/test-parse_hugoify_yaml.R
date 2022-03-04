@@ -2,6 +2,23 @@
 # TODO: revisit config and theme
 
 
+test_that("construct_page_calls returns a list of calls", {
+
+  # empty content - should just make the home page
+  yaml <- paste("---", "content:", "---", sep="\n")
+  num_pages <- 1
+
+  yaml_list <- yaml::yaml.load(yaml)
+  page_calls <- construct_page_calls(yaml_list)
+
+  expect_type(page_calls, "list")
+  expect_length(page_calls, num_pages)
+  expect_equal(vapply(page_calls, is.call, TRUE),
+               rep( TRUE, length(page_calls) ))
+})
+
+
+
 test_that("parse_hugoify_yaml checks for expected keys", {
 
   yaml_file <- withr::local_file("hugoify.yml")
