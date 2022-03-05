@@ -1,37 +1,35 @@
-make_page <- function(page_name, bundle=TRUE) {
+# TODO: check for overwriting existing md file
+# TODO: check for overwriting existing bundle directory
+# TODO: should we confirm that boolean args are, in fact, bools?
 
-  # create the directory
+make_page <- function(page_name, params=list(), output_dir = ".",
+                      is_list_page=FALSE, bundle=TRUE) {
+
+  # list pages must be bundles
+  if (is_list_page==TRUE & bundle==FALSE) {
+    stop("List pages must be bundles.\n",
+         "'bundle' must not be FALSE if 'is_list_page' is TRUE")
+  }
+
+  # determine name of output file
+  if (bundle==FALSE) {
+    output_file <- paste0(page_name, ".md")
+  } else if (is_list_page) {
+    output_file <- "_index.md"
+  } else {
+    output_file <- "index.md"
+  }
+
+  # create the page directory
   if (bundle) {
     dir.create(page_name)
+    output_dir <- file.path(output_dir, page_name)
   }
+
+  # write file
+  write_md( yaml = params,
+            filename = output_file, output_dir = output_dir)
 
   invisible(page_name)
 
 }
-
-
-# make_page <- function(page_name, bundle=TRUE, output_dir=".") {
-#   print(paste("making", page_name, "page"))
-#
-#   if (bundle) {
-#
-#     # make the directory
-#     if (dir.exists(page_name)) {
-#       #TODO: warning and/or have an overwrite argument
-#     } else {
-#       output_dir <= file.path(output_dir, page_name)
-#       dir.create(output_dir)
-#     }
-#
-#     # set the page name
-#     output_file <- "index.md"
-#
-#
-#   } else {
-#     #TODO: error if list page, (or if has resources?)
-#     output_file <- paste0( page_name, ".md")
-#   }
-#
-#   write_md(filename = output_file, output_dir = output_dir)
-#
-# }
