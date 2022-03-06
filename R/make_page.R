@@ -4,6 +4,7 @@
 # TODO: actually think about output_dir
 #       - I'm tossing it in right now so I can do snapshot testing in a tempdir
 #       - need to come back and do tests / figure out handling of overwriting
+# TODO: handle spaces in page_name. YAML permits spaces in keys
 
 make_page <- function(page_name, params=list(), output_dir = ".",
                       is_list_page=FALSE, bundle=TRUE) {

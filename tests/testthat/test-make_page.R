@@ -47,15 +47,36 @@ test_that("make_page handles page params", {
 
   # no params should have empty yaml header
   dir <- withr::local_tempdir()
-  print(dir)
-  make_page("no_params", output_dir = dir)
-  expect_snapshot_file(file.path(dir, "no_params", "index.md"), name="no_params.md")
+  make_page("params_no", output_dir = dir)
+  expect_snapshot_file(file.path(dir, "params_no", "index.md"), name="params_no.md")
 
-  # params sare written to the yaml header
+  # params are written to the yaml header
   dir <- withr::local_tempdir()
-  print(dir)
-  make_page("yes_params", output_dir = dir,
+  make_page("params_yes", output_dir = dir,
             params=list(param1="first param", param2="second param") )
-  expect_snapshot_file(file.path(dir, "yes_params", "index.md"), name="yes_params.md")
+  expect_snapshot_file(file.path(dir, "params_yes", "index.md"), name="params_yes.md")
+})
+
+test_that("make_page handles page content", {
+
+  # no content should have empty ybody
+  dir <- withr::local_tempdir()
+  make_page("content_no", output_dir = dir)
+  expect_snapshot_file(file.path(dir, "content_no", "index.md"), name="content_no.md")
+
+  # content is written to the body
+  dir <- withr::local_tempdir()
+  make_page("content_yes", output_dir = dir,
+            content="This page was written by make_page()." )
+  expect_snapshot_file(file.path(dir, "content_yes", "index.md"), name="content_yes.md")
+})
+
+test_that("make_test_page produces expected output", {
+  # make_test_page is a wrapper for make_page
+  # no need for extensive testing, just capture a snapshot
+  dir <- withr::local_tempdir()
+  make_test_page("default_test_page", output_dir = dir,)
+  expect_snapshot_file(file.path(dir, "default_test_page", "index.md"), name="default_test_page.md")
+
 })
 
