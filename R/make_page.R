@@ -1,6 +1,9 @@
 # TODO: check for overwriting existing md file
 # TODO: check for overwriting existing bundle directory
 # TODO: should we confirm that boolean args are, in fact, bools?
+# TODO: actually think about output_dir
+#       - I'm tossing it in right now so I can do snapshot testing in a tempdir
+#       - need to come back and do tests / figure out handling of overwriting
 
 make_page <- function(page_name, params=list(), output_dir = ".",
                       is_list_page=FALSE, bundle=TRUE) {
@@ -22,8 +25,8 @@ make_page <- function(page_name, params=list(), output_dir = ".",
 
   # create the page directory
   if (bundle) {
-    dir.create(page_name)
     output_dir <- file.path(output_dir, page_name)
+    dir.create(output_dir)
   }
 
   # write file
@@ -32,4 +35,14 @@ make_page <- function(page_name, params=list(), output_dir = ".",
 
   invisible(page_name)
 
+}
+
+make_test_page <- function(page_name, params=list(title=page_name), ...) {
+  lorum <- "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+
+  # if (is.null(content)) {
+  #   content <- paste0("This is the **", page_name, "** page.\n\n", lorum)
+  # }
+
+  make_page(page_name, params, ...)
 }

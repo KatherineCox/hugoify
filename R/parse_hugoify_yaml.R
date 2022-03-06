@@ -3,6 +3,14 @@
 #         - a collection of calls, but how should this be organized?
 # TODO: should parse_hugoify_yaml accept an output_dir arg?
 # TODO: should overwrite=FALSE (in e.g. file.copy)?
+# TODO: construct_page_calls handles params
+# TODO: construct_page_calls handles output_dir
+# TODO: construct_page_calls handles is_list_page
+# TODO: construct_page_calls handles bundles
+
+# For construct_page_calls, would it be better to return a list that can be coerced to a call?
+# - Then we could still see the name of the function that was called
+# - But, we might catch some extra errors by doing the coercion
 
 parse_hugoify_yaml <- function( yaml_file, output_dir=NULL, quiet=FALSE ) {
 
