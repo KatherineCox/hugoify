@@ -39,11 +39,11 @@ parse_hugoify_yaml <- function( yaml_file, output_dir=NULL, quiet=FALSE ) {
     stop("Found both 'content' and 'home' keys in hugoify yaml config.\n",
          "hugoify must have either 'content' or 'home' but not both.")
   } else if (content) {
-    calls <- construct_page_calls( y["content"],
-                                   output_dir=file.path(output_dir, "content"))
+    calls <- construct_page_calls( y["content"])
   } else if (home) {
-    calls <- construct_page_calls( y["home"],
-                                   output_dir=file.path(output_dir, "content"))
+    # rename it, so the hugo directory will have the correct name
+    names(y)[ names(y)=="home" ] <- "content"
+    calls <- construct_page_calls( y["content"])
   } else {
     stop("No site content found.\n",
          "hugoify yaml config must have a 'content' or 'home' key.")
