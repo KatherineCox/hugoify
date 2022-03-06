@@ -59,7 +59,7 @@ test_that("make_page handles page params", {
 
 test_that("make_page handles page content", {
 
-  # no content should have empty ybody
+  # no content should have empty body
   dir <- withr::local_tempdir()
   make_page("content_no", output_dir = dir)
   expect_snapshot_file(file.path(dir, "content_no", "index.md"), name="content_no.md")

@@ -5,8 +5,9 @@
 #       - I'm tossing it in right now so I can do snapshot testing in a tempdir
 #       - need to come back and do tests / figure out handling of overwriting
 # TODO: handle spaces in page_name. YAML permits spaces in keys
+# TODO: add markdown to default make_test_page content?
 
-make_page <- function(page_name, params=list(), output_dir = ".",
+make_page <- function(page_name, params=list(), output_dir = ".", content=NULL,
                       is_list_page=FALSE, bundle=TRUE) {
 
   # list pages must be bundles
@@ -31,19 +32,19 @@ make_page <- function(page_name, params=list(), output_dir = ".",
   }
 
   # write file
-  write_md( yaml = params,
+  write_md( yaml = params, content=content,
             filename = output_file, output_dir = output_dir)
 
   invisible(page_name)
 
 }
 
-make_test_page <- function(page_name, params=list(title=page_name), ...) {
+make_test_page <- function(page_name, params=list(title=page_name), content=NULL, ...) {
   lorum <- "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.\nDuis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 
-  # if (is.null(content)) {
-  #   content <- paste0("This is the **", page_name, "** page.\n\n", lorum)
-  # }
+  if (is.null(content)) {
+    content <- paste0("This is the **", page_name, "** page.\n\n", lorum)
+  }
 
-  make_page(page_name, params, ...)
+  make_page(page_name, params=params, content=content, ...)
 }
