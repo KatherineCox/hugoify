@@ -3,7 +3,7 @@ test_that("make_page raises error for not bundling a list page", {
                regexp = "List pages must be bundles.")
 })
 
-test_that("make_page creates a directory if needed", {
+test_that("make_page creates a bundle directory if needed", {
 
   withr::with_tempdir({
     make_page("yes_bundle")
@@ -72,11 +72,11 @@ test_that("make_page handles page content", {
 })
 
 test_that("make_test_page produces expected output", {
-  # make_test_page is a wrapper for make_page
-  # no need for extensive testing, just capture a snapshot
-  dir <- withr::local_tempdir()
-  make_test_page("default_test_page", output_dir = dir,)
-  expect_snapshot_file(file.path(dir, "default_test_page", "index.md"), name="default_test_page.md")
-
+#   # make_test_page is a wrapper for make_page
+#   # no need for extensive testing, just capture a snapshot
+#   dir <- withr::local_tempdir()
+#   make_test_page("default_test_page", output_dir = dir,)
+#   expect_snapshot_file(file.path(dir, "default_test_page", "index.md"), name="default_test_page.md")
+#
 })
 
