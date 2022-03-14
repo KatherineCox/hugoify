@@ -4,14 +4,14 @@
 #       - is it better to keep them in list form, and convert with as.call() later?
 
 test_that("construct_page_calls raises error if passed a yaml string or file", {
-  yaml <- paste("---", "content:", "---", sep="\n")
-  expect_error(construct_page_calls(yaml))
+  yaml <- paste("---", "home:", "---", sep="\n")
+  expect_error(construct_page_calls(yaml), regexp = "yaml_list must be a list")
 })
 
 test_that("construct_page_calls returns a list of calls", {
 
   # empty content - should just make the home page
-  yaml <- paste("---", "content:", "---", sep="\n")
+  yaml <- paste("---", "home:", "---", sep="\n")
   num_pages <- 1
 
   yaml_list <- yaml::yaml.load(yaml)
@@ -27,32 +27,46 @@ test_that("construct_page_calls returns calls with expected functions and args",
   # this should probably get split up into multiple tests as I figure out how to break it down
 
   # empty content - should just make the home page
-  yaml <- paste("---", "content:", "---", sep="\n")
+  yaml <- paste("---", "home:", "---", sep="\n")
   yaml_list <- yaml::yaml.load(yaml)
   page_calls <- construct_page_calls(yaml_list)
 
   single_call <- page_calls[[1]]
   expect_identical(single_call[[1]], make_page)
-  expect_identical(single_call[["page_name"]], "content")
+  expect_identical(single_call[["page_name"]], "home")
 })
 
 test_that("construct_page_calls passes args to make_page", {
 
   # an arg should be not be present if it's not specified in the yaml
   # check that each arg is absent by default
-  yaml <- paste("---", "content:", "---", sep="\n")
+  yaml <- paste("---", "home:", "---", sep="\n")
   yaml_list <- yaml::yaml.load(yaml)
   page_calls <- construct_page_calls(yaml_list)
 
   single_call <- page_calls[[1]]
+  expect_false( "params" %in% names(single_call) )
+  expect_false( "content" %in% names(single_call) )
   expect_false( "is_list_page" %in% names(single_call) )
   expect_false( "is_bundle" %in% names(single_call) )
 
   # now check that each arg is added appropriately if specified in the yaml
 
+  # content
+  yaml <- paste("---",
+                "home:",
+                "  content: 'Here is some content'",
+                "---", sep="\n")
+  yaml_list <- yaml::yaml.load(yaml)
+  page_calls <- construct_page_calls(yaml_list)
+
+  single_call <- page_calls[[1]]
+  expect_identical(single_call[[1]], make_page)
+  expect_identical(single_call[["content"]],"Here is some content")
+
   # is_list_page
   yaml <- paste("---",
-                "content:",
+                "home:",
                 "  is_list_page: true",
                 "---", sep="\n")
   yaml_list <- yaml::yaml.load(yaml)
@@ -64,7 +78,7 @@ test_that("construct_page_calls passes args to make_page", {
 
   # is_bundle
   yaml <- paste("---",
-                "content:",
+                "home:",
                 "  is_bundle: false",
                 "---", sep="\n")
   yaml_list <- yaml::yaml.load(yaml)
