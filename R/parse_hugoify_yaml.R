@@ -118,9 +118,10 @@ construct_page_calls <- function( yaml_list, output_dir = "." ) {
     }
 
     # construct the call for this page by adding the function and page_name
+    # to the front of the args list
     call_args <- c( list( make_page, page_name = page ), call_args)
 
-    # add the call for this page to the end of the list
+    # add the call for this page to the end of the list of page calls
     page_calls[[length(page_calls) + 1]] <- as.call(call_args)
 
   }

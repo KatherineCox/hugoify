@@ -1,17 +1,18 @@
 # TODO: test parse_hugoify_yaml puts things in the right directory if given output_dir
 # TODO: revisit config and theme
+# TODO: should we allow overriding of page_name?
 # TODO: if things have already been converted to calls, it's hard to test what function they're calling
 #       - is it better to keep them in list form, and convert with as.call() later?
 
 test_that("construct_page_calls raises error if passed a yaml string or file", {
-  yaml <- paste("---", "home:", "---", sep="\n")
+  yaml <- paste("---", "page1:", "---", sep="\n")
   expect_error(construct_page_calls(yaml), regexp = "yaml_list must be a list")
 })
 
 test_that("construct_page_calls returns a list of calls", {
 
   # empty content - should just make the home page
-  yaml <- paste("---", "home:", "---", sep="\n")
+  yaml <- paste("---", "page1:", "---", sep="\n")
   num_pages <- 1
 
   yaml_list <- yaml::yaml.load(yaml)
@@ -26,20 +27,20 @@ test_that("construct_page_calls returns a list of calls", {
 test_that("construct_page_calls returns calls with expected functions and args", {
   # this should probably get split up into multiple tests as I figure out how to break it down
 
-  # empty content - should just make the home page
-  yaml <- paste("---", "home:", "---", sep="\n")
+  # empty content - should just make a single page
+  yaml <- paste("---", "page1:", "---", sep="\n")
   yaml_list <- yaml::yaml.load(yaml)
   page_calls <- construct_page_calls(yaml_list)
 
   single_call <- page_calls[[1]]
   expect_identical(single_call[[1]], make_page)
-  expect_identical(single_call[["page_name"]], "home")
+  expect_identical(single_call[["page_name"]], "page1")
 })
 
 test_that("construct_page_calls raises error for incorrect make_page arg names", {
 
   yaml <- paste("---",
-                "home:",
+                "page1:",
                 "  foo: 'Your argument is invalid.'",
                 "---", sep="\n")
   yaml_list <- yaml::yaml.load(yaml)
@@ -50,7 +51,7 @@ test_that("construct_page_calls passes args to make_page", {
 
   # an arg should be not be present if it's not specified in the yaml
   # check that each arg is absent by default
-  yaml <- paste("---", "home:", "---", sep="\n")
+  yaml <- paste("---", "page1:", "---", sep="\n")
   yaml_list <- yaml::yaml.load(yaml)
   page_calls <- construct_page_calls(yaml_list)
 
@@ -58,14 +59,37 @@ test_that("construct_page_calls passes args to make_page", {
   expect_false( "params" %in% names(single_call) )
   expect_false( "content" %in% names(single_call) )
   expect_false( "is_list_page" %in% names(single_call) )
-  expect_false( "is_bundle" %in% names(single_call) )
+  expect_false( "bundle" %in% names(single_call) )
+
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, eval(single_call))
+  expect_snapshot_file(file.path(dir, "page1", "index.md"), name="no_args.md")
+
 
   # now check that each arg is added appropriately if specified in the yaml
 
+  # params
+  yaml <- paste("---",
+                "page1:",
+                "  params:",
+                "    param1: first param",
+                "    param2: second param",
+                "---", sep="\n")
+  yaml_list <- yaml::yaml.load(yaml)
+  page_calls <- construct_page_calls(yaml_list)
+
+  single_call <- page_calls[[1]]
+  expect_identical(single_call[[1]], make_page)
+  expect_identical(single_call[["params"]], list(param1="first param", param2="second param"))
+
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, eval(single_call))
+  expect_snapshot_file(file.path(dir, "page1", "index.md"), name="params.md")
+
   # content
   yaml <- paste("---",
-                "home:",
-                "  content: 'Here is some content'",
+                "page1:",
+                "  content: 'Here is some content.'",
                 "---", sep="\n")
   yaml_list <- yaml::yaml.load(yaml)
   page_calls <- construct_page_calls(yaml_list)
@@ -74,9 +98,14 @@ test_that("construct_page_calls passes args to make_page", {
   expect_identical(single_call[[1]], make_page)
   expect_identical(single_call[["content"]],"Here is some content")
 
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, eval(single_call))
+  expect_snapshot_file(file.path(dir, "page1", "index.md"), name="content.md")
+
+
   # is_list_page
   yaml <- paste("---",
-                "home:",
+                "page1:",
                 "  is_list_page: true",
                 "---", sep="\n")
   yaml_list <- yaml::yaml.load(yaml)
@@ -86,9 +115,13 @@ test_that("construct_page_calls passes args to make_page", {
   expect_identical(single_call[[1]], make_page)
   expect_identical(single_call[["is_list_page"]], TRUE)
 
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, eval(single_call))
+  expect_true( file.exists( file.path(dir, "page1", "_index.md") ) )
+
   # bundle
   yaml <- paste("---",
-                "home:",
+                "page1:",
                 "  bundle: false",
                 "---", sep="\n")
   yaml_list <- yaml::yaml.load(yaml)
@@ -97,6 +130,14 @@ test_that("construct_page_calls passes args to make_page", {
   single_call <- page_calls[[1]]
   expect_identical(single_call[[1]], make_page)
   expect_identical(single_call[["bundle"]], FALSE)
+
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, eval(single_call))
+  expect_true( file.exists( file.path(dir, "page1.md") ) )
+
+
+  # double check that nothing goes wonky when we combine everything together
+  # just a snapshot, so we don't have to update tests of individual elements
 
 })
 
