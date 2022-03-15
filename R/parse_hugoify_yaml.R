@@ -5,6 +5,11 @@
 # TODO: should overwrite=FALSE (in e.g. file.copy)?
 # TODO: construct_page_calls handles params
 # TODO: construct_page_calls handles output_dir
+# TODO: construct_page_calls checks args before building make_page call
+#       - think more about what checks are needed
+# TODO: test make_page before construct_page_calls
+#       - test files are run alphabetically, so can rename e.g. test-1-make_page.R
+#       - https://testthat.r-lib.org/articles/parallel.html#changing-the-order-of-the-test-files
 
 # For construct_page_calls, would it be better to return a list that can be coerced to a call?
 # - Then we could still see the name of the function that was called
@@ -102,9 +107,18 @@ construct_page_calls <- function( yaml_list, output_dir = "." ) {
 
   for ( page in names(yaml_list) ) {
 
-    # construct the call for this page
-    call_args <- list( make_page, page_name = page ) # function and page name
-    call_args <- c(call_args, yaml_list[[page]])     # args for this page
+    call_args <- yaml_list[[page]]
+
+    # verify the arguments are valid
+    for (arg in names(call_args)) {
+      if (! (arg %in% names(formals(make_page))) ) {
+        stop("Cannot construct call for page '", page, "'\n",
+             "'", arg, "' is not a valid argument to make_page.")
+      }
+    }
+
+    # construct the call for this page by adding the function and page_name
+    call_args <- c( list( make_page, page_name = page ), call_args)
 
     # add the call for this page to the end of the list
     page_calls[[length(page_calls) + 1]] <- as.call(call_args)

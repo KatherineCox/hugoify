@@ -36,6 +36,16 @@ test_that("construct_page_calls returns calls with expected functions and args",
   expect_identical(single_call[["page_name"]], "home")
 })
 
+test_that("construct_page_calls raises error for incorrect make_page arg names", {
+
+  yaml <- paste("---",
+                "home:",
+                "  foo: 'Your argument is invalid.'",
+                "---", sep="\n")
+  yaml_list <- yaml::yaml.load(yaml)
+  expect_error(construct_page_calls(yaml_list), regexp = "is not a valid argument to make_page.")
+})
+
 test_that("construct_page_calls passes args to make_page", {
 
   # an arg should be not be present if it's not specified in the yaml
@@ -76,17 +86,17 @@ test_that("construct_page_calls passes args to make_page", {
   expect_identical(single_call[[1]], make_page)
   expect_identical(single_call[["is_list_page"]], TRUE)
 
-  # is_bundle
+  # bundle
   yaml <- paste("---",
                 "home:",
-                "  is_bundle: false",
+                "  bundle: false",
                 "---", sep="\n")
   yaml_list <- yaml::yaml.load(yaml)
   page_calls <- construct_page_calls(yaml_list)
 
   single_call <- page_calls[[1]]
   expect_identical(single_call[[1]], make_page)
-  expect_identical(single_call[["is_bundle"]], FALSE)
+  expect_identical(single_call[["bundle"]], FALSE)
 
 })
 
