@@ -10,10 +10,9 @@
 # TODO: test make_page before construct_page_calls
 #       - test files are run alphabetically, so can rename e.g. test-1-make_page.R
 #       - https://testthat.r-lib.org/articles/parallel.html#changing-the-order-of-the-test-files
-
-# For construct_page_calls, would it be better to return a list that can be coerced to a call?
-# - Then we could still see the name of the function that was called
-# - But, we might catch some extra errors by doing the coercion
+# TODO: For construct_page_calls, would it be better to return a list that can be coerced to a call?
+#       - Then we could still see the name of the function that was called
+#       - But, we might catch some extra errors by doing the coercion
 #
 # parse_hugoify_yaml <- function( yaml_file, output_dir=NULL, quiet=FALSE ) {
 #
