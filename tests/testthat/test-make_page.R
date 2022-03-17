@@ -3,6 +3,45 @@ test_that("make_page raises error for not bundling a list page", {
                regexp = "List pages must be bundles.")
 })
 
+test_that("make_page raises error if bundle or page already exists", {
+
+  # for page bundles (the default) check for the directory
+  withr::with_tempdir({
+    page_name <- "existing_page"
+    dir.create(page_name)
+    file.create(file.path(page_name, "index.md"))
+    expect_error(make_page(page_name), regexp = "already exists")
+  })
+
+  # no error if clean=TRUE
+  withr::with_tempdir({
+    page_name <- "existing_page"
+    dir.create(page_name)
+    file.create(file.path(page_name, "index.md"))
+    expect_error(make_page(page_name, clean=TRUE), regexp = NA)
+  })
+
+  # for non-bundle pages, check for the .md file
+  withr::with_tempdir({
+    page_name <- "existing_page"
+    file.create( paste0(page_name, ".md"))
+    expect_error(make_page(page_name, bundle=FALSE), regexp = "already exists")
+  })
+
+  # no error if clean=TRUE
+  withr::with_tempdir({
+    page_name <- "existing_page"
+    file.create( paste0(page_name, ".md"))
+    expect_error(make_page(page_name, bundle=FALSE, clean=TRUE), regexp = NA)
+  })
+
+
+})
+
+test_that("make_page replaces old bundle directory if clean=TRUE", {
+  # xfun::dir_create is a wrapper for dir.create() that first checks if it exists
+})
+
 test_that("make_page creates a bundle directory if needed", {
 
   withr::with_tempdir({

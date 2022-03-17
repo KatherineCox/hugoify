@@ -7,7 +7,8 @@
 # TODO: handle spaces in page_name. YAML permits spaces in keys
 # TODO: add markdown to default make_test_page content?
 
-make_page <- function(page_name, output_dir = ".", params=list(),  content=NULL,
+make_page <- function(page_name, output_dir = ".", clean=FALSE,
+                      params=list(),  content=NULL,
                       is_list_page=FALSE, bundle=TRUE) {
 
   # list pages must be bundles
@@ -19,6 +20,17 @@ make_page <- function(page_name, output_dir = ".", params=list(),  content=NULL,
   # create the page directory
   if (bundle) {
     output_dir <- file.path(output_dir, page_name)
+
+    # check if it already exists
+    if ( dir.exists(output_dir) ) {
+      if (clean) {
+        unlink(output_dir, recursive = TRUE)
+      } else {
+        stop("' ", output_dir, "' already exists.\n",
+             "To overwrite existing directories, set 'clean=TRUE'")
+      }
+    }
+
     dir.create(output_dir)
   }
 
@@ -29,6 +41,17 @@ make_page <- function(page_name, output_dir = ".", params=list(),  content=NULL,
     output_file <- "_index.md"
   } else {
     output_file <- "index.md"
+  }
+
+  # confirm that this file doesn't already exist (unless clean=TRUE)
+  f <- file.path(output_dir, output_file)
+  if (file.exists(f)) {
+    if (clean) {
+      unlink(f)
+    } else {
+      stop("' ", f, "' already exists.\n",
+           "To overwrite existing files, set 'clean=TRUE'")
+    }
   }
 
   # write file

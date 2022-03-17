@@ -1,5 +1,4 @@
 # TODO: test write_md writing in other directories? Or just assume file.path does its job?
-# TODO: test write_md with a more complicated yaml?  Or just assume as.yaml does its job?
 
 test_that("write_md outputs the expected markdown file", {
   yaml <- list(title="A Test Page")
