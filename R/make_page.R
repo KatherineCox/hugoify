@@ -1,5 +1,3 @@
-# TODO: check for overwriting existing md file
-# TODO: check for overwriting existing bundle directory
 # TODO: should we confirm that boolean args are, in fact, bools?
 # TODO: actually think about output_dir
 #       - I'm tossing it in right now so I can do snapshot testing in a tempdir
