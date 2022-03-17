@@ -35,11 +35,6 @@ test_that("make_page raises error if bundle or page already exists", {
     expect_error(make_page(page_name, bundle=FALSE, clean=TRUE), regexp = NA)
   })
 
-
-})
-
-test_that("make_page replaces old bundle directory if clean=TRUE", {
-  # xfun::dir_create is a wrapper for dir.create() that first checks if it exists
 })
 
 test_that("make_page creates a bundle directory if needed", {
@@ -78,22 +73,47 @@ test_that("make_page creates a file with the correct name and location", {
 
 })
 
-test_that("make_page creates non-existent output_dir", {
+test_that("make_page replaces old pages if clean=TRUE", {
 
+  # bundle - it should wipe out everything in the old bundle
   withr::with_tempdir({
-    make_page("yes_bundle", output_dir="foo")
-    expect_true( dir.exists("foo") )
-    expect_true( dir.exists( file.path("foo", "yes_bundle") ) )
-    expect_true( file.exists( file.path("foo", "yes_bundle", "index.md") ) )
+
+    # make the directory and put some stuff in it
+    page_name <- "existing_page"
+    dir.create(page_name)
+    writeLines("---\ntitle: old page\n---\n\nThis is the old page.",
+               file.path(page_name, "index.md"))
+    writeLines("Some other file", file.path(page_name, "other_file.txt"))
+
+    # sanity check, what's the state before make_page()
+    expect_true(file.exists(file.path(page_name, "other_file.txt")))
+    expect_true(grepl("old", readLines(file.path(page_name, "index.md"))[[2]] ))
+
+    # a new make_page call should replace everything
+    make_page(page_name, clean=TRUE)
+    expect_false(file.exists(file.path(page_name, "other_file.txt")))
+    expect_false(grepl("old", readLines(file.path(page_name, "index.md"))[[2]] ))
+
   })
 
-  # recursive
+  # no bundle - it should just delete the .md file but leave other files in place
   withr::with_tempdir({
-    make_page("yes_bundle", output_dir=file.path("foo", "bar"))
-    expect_true( dir.exists("foo") )
-    expect_true( dir.exists( file.path("foo", "bar") ) )
-    expect_true( dir.exists( file.path("foo", "bar", "yes_bundle") ) )
-    expect_true( file.exists( file.path("foo", "bar", "yes_bundle", "index.md") ) )
+
+    # make the page, plus another file that should not be deleted
+    page_name <- "existing_page"
+    writeLines("---\ntitle: old page\n---\n\nThis is the old page.",
+               paste0(page_name, ".md"))
+    writeLines("Some other file", "other_file.txt")
+
+    # sanity check, what's the state before make_page()
+    expect_true(file.exists("other_file.txt"))
+    expect_true(grepl("old", readLines(paste0(page_name, ".md"))[[2]] ))
+
+    # a new make_page call should replace only the page file
+    make_page(page_name, bundle=FALSE, clean=TRUE)
+    expect_true(file.exists("other_file.txt"))
+    expect_false(grepl("old", readLines(paste0(page_name, ".md"))[[2]] ))
+
   })
 
 })
@@ -112,6 +132,26 @@ test_that("make_page respects output_dir", {
     dir.create("foo")
     make_page("no_bundle", output_dir="foo", bundle=FALSE)
     expect_true( file.exists( file.path("foo", "no_bundle.md") ) )
+  })
+
+})
+
+test_that("make_page creates non-existent output_dir", {
+
+  withr::with_tempdir({
+    make_page("yes_bundle", output_dir="foo")
+    expect_true( dir.exists("foo") )
+    expect_true( dir.exists( file.path("foo", "yes_bundle") ) )
+    expect_true( file.exists( file.path("foo", "yes_bundle", "index.md") ) )
+  })
+
+  # recursive
+  withr::with_tempdir({
+    make_page("yes_bundle", output_dir=file.path("foo", "bar"))
+    expect_true( dir.exists("foo") )
+    expect_true( dir.exists( file.path("foo", "bar") ) )
+    expect_true( dir.exists( file.path("foo", "bar", "yes_bundle") ) )
+    expect_true( file.exists( file.path("foo", "bar", "yes_bundle", "index.md") ) )
   })
 
 })
