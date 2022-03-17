@@ -15,6 +15,11 @@ make_page <- function(page_name, output_dir = ".", clean=FALSE,
          "'bundle' must not be FALSE if 'is_list_page' is TRUE")
   }
 
+  # check if the output directory exists
+  if (! dir.exists(output_dir) ) {
+    dir.create(output_dir, recursive=TRUE)
+  }
+
   # create the page directory
   if (bundle) {
     output_dir <- file.path(output_dir, page_name)

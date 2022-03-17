@@ -78,10 +78,22 @@ test_that("make_page creates a file with the correct name and location", {
 
 })
 
-test_that("make_page raises error for non-existent output_dir", {
+test_that("make_page creates non-existent output_dir", {
 
   withr::with_tempdir({
-    expect_error(make_page("yes_bundle", output_dir="foo"), regexp = "fix me")
+    make_page("yes_bundle", output_dir="foo")
+    expect_true( dir.exists("foo") )
+    expect_true( dir.exists( file.path("foo", "yes_bundle") ) )
+    expect_true( file.exists( file.path("foo", "yes_bundle", "index.md") ) )
+  })
+
+  # recursive
+  withr::with_tempdir({
+    make_page("yes_bundle", output_dir=file.path("foo", "bar"))
+    expect_true( dir.exists("foo") )
+    expect_true( dir.exists( file.path("foo", "bar") ) )
+    expect_true( dir.exists( file.path("foo", "bar", "yes_bundle") ) )
+    expect_true( file.exists( file.path("foo", "bar", "yes_bundle", "index.md") ) )
   })
 
 })
