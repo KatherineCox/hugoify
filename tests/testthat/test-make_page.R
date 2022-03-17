@@ -78,6 +78,14 @@ test_that("make_page creates a file with the correct name and location", {
 
 })
 
+test_that("make_page raises error for non-existent output_dir", {
+
+  withr::with_tempdir({
+    expect_error(make_page("yes_bundle", output_dir="foo"), regexp = "fix me")
+  })
+
+})
+
 test_that("make_page respects output_dir", {
 
   # if it's a bundle, expect an index.md inside the bundle directory
