@@ -92,6 +92,12 @@
 #   calls
 # }
 #
+
+
+# build a list of calls to make_page()
+# This lets us catch most yaml errors while building the calls
+# rather than getting halfway through creating the test site and then crashing
+
 construct_page_calls <- function( yaml_list, output_dir = "." ) {
 
   # YAML handling should be done in parse_hugoify_yaml

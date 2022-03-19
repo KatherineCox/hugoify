@@ -73,6 +73,16 @@ test_that("make_page creates a file with the correct name and location", {
 
 })
 
+test_that("make_page handles wonky page names", {
+
+  # spaces in name
+  withr::with_tempdir({
+    make_page("yes bundle")
+    expect_true( file.exists( file.path("yes-bundle", "index.md") ) )
+  })
+
+})
+
 test_that("make_page replaces old pages if clean=TRUE", {
 
   # bundle - it should wipe out everything in the old bundle
@@ -191,5 +201,9 @@ test_that("make_test_page produces expected output", {
 #   make_test_page("default_test_page", output_dir = dir,)
 #   expect_snapshot_file(file.path(dir, "default_test_page", "index.md"), name="default_test_page.md")
 #
+})
+
+test_that("sanitize_page_name replaces spaces", {
+  expect_identical("no-spaces-here", sanitize_page_name("no spaces here") )
 })
 
