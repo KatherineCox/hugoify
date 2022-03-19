@@ -1,15 +1,23 @@
 # TODO: test output_dir
-
-test_that("construct_page_calls raises error if passed a yaml string or file", {
-  yaml <- paste("---", "page1:", "---", sep="\n")
-  expect_error(construct_page_calls(yaml), regexp = "yaml_list must be a list")
-})
+# TODO: test multiple pages with args
 
 test_that("construct_page_calls returns a list of calls", {
 
-  # empty content - should just make the home page
+  # single page, no additional args
   yaml <- paste("---", "page1:", "---", sep="\n")
   num_pages <- 1
+
+  yaml_list <- yaml::yaml.load(yaml)
+  page_calls <- construct_page_calls(yaml_list)
+
+  expect_type(page_calls, "list")
+  expect_length(page_calls, num_pages)
+  expect_equal(vapply(page_calls, is.call, TRUE),
+               rep( TRUE, length(page_calls) ))
+
+  # two pages
+  yaml <- paste("---", "page1:", "page2:", "---", sep="\n")
+  num_pages <- 2
 
   yaml_list <- yaml::yaml.load(yaml)
   page_calls <- construct_page_calls(yaml_list)
@@ -31,6 +39,69 @@ test_that("construct_page_calls returns calls with expected functions and args",
   single_call <- page_calls[[1]]
   expect_identical(single_call[[1]], make_page)
   expect_identical(single_call[["page_name"]], "page1")
+
+  # snapshot the eval result
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, eval(single_call))
+  expect_snapshot_file(file.path(dir, "page1", "index.md"), name="base.md")
+})
+
+test_that("construct_page_calls handles non-key pages", {
+
+  # no colon after page name means it gets read in as a character vector rather than a list
+  yaml <- paste("---", "page1", "---", sep="\n")
+  yaml_list <- yaml::yaml.load(yaml)
+  page_calls <- construct_page_calls(yaml_list)
+
+  single_call <- page_calls[[1]]
+  expect_identical(single_call[[1]], make_page)
+  expect_identical(single_call[["page_name"]], "page1")
+
+  # snapshot the eval result
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, eval(single_call))
+  expect_snapshot_file(file.path(dir, "page1", "index.md"), name="character.md")
+})
+
+test_that("construct_page_calls handles multiple pages", {
+
+  yaml <- paste("---", "page1:", "page2:", "---", sep="\n")
+  yaml_list <- yaml::yaml.load(yaml)
+  page_calls <- construct_page_calls(yaml_list)
+
+  single_call <- page_calls[[1]]
+  expect_identical(single_call[[1]], make_page)
+  expect_identical(single_call[["page_name"]], "page1")
+
+  single_call <- page_calls[[2]]
+  expect_identical(single_call[[1]], make_page)
+  expect_identical(single_call[["page_name"]], "page2")
+
+  # snapshot the eval result
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, lapply(page_calls, eval) )
+  expect_snapshot_file(file.path(dir, "page1", "index.md"), name="multi_page1.md")
+  expect_snapshot_file(file.path(dir, "page2", "index.md"), name="multi_page2.md")
+
+  # character vector rather than a list
+  yaml <- paste("---", "- page1", "- page2", "---", sep="\n")
+  yaml_list <- yaml::yaml.load(yaml)
+  page_calls <- construct_page_calls(yaml_list)
+
+  single_call <- page_calls[[1]]
+  expect_identical(single_call[[1]], make_page)
+  expect_identical(single_call[["page_name"]], "page1")
+
+  single_call <- page_calls[[2]]
+  expect_identical(single_call[[1]], make_page)
+  expect_identical(single_call[["page_name"]], "page2")
+
+  # snapshot the eval result
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, lapply(page_calls, eval) )
+  expect_snapshot_file(file.path(dir, "page1", "index.md"), name="multi_char_page1.md")
+  expect_snapshot_file(file.path(dir, "page2", "index.md"), name="multi_char_page2.md")
+
 })
 
 test_that("construct_page_calls raises error for incorrect make_page arg names", {
@@ -155,7 +226,7 @@ test_that("construct_page_calls passes all args to make_page", {
 
   # double check that nothing goes wonky when we have multiple arguments
   # just a snapshot so we don't have to update expect_identical() tests
-  # of individual elements in two places
+  # of individual elements in multiple places
 
   yaml <- paste("---",
                 "page1:",
@@ -172,6 +243,35 @@ test_that("construct_page_calls passes all args to make_page", {
   dir <- withr::local_tempdir()
   withr::with_dir(dir, eval(single_call))
   expect_snapshot_file(file.path(dir, "page1", "index.md"), name="multiple_args.md")
+
+})
+
+test_that("construct_page_calls passes on args when there are multiple pages", {
+
+  # double check that nothing goes wonky when we have multiple pages
+  # just a snapshot so we don't have to update expect_identical() tests
+  # of individual elements in multiple places
+
+  yaml <- paste("---",
+                "page1:",
+                "  params:",
+                "    param1: first param",
+                "    param2: second param",
+                "  content: 'Here is some content.'",
+                "page2:",
+                "  params:",
+                "    param1: foo",
+                "    param2: bar",
+                "  content: 'Content for page2.'",
+                "---", sep="\n")
+  yaml_list <- yaml::yaml.load(yaml)
+  page_calls <- construct_page_calls(yaml_list)
+
+  # snapshot the eval result
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, lapply(page_calls, eval) )
+  expect_snapshot_file(file.path(dir, "page1", "index.md"), name="multi_page_multi_args1.md")
+  expect_snapshot_file(file.path(dir, "page2", "index.md"), name="multi_page_multi_args2.md")
 
 })
 
