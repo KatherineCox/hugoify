@@ -136,6 +136,38 @@ test_that("construct_page_calls passes output_dir to make_page", {
 
 })
 
+test_that("construct_page_calls passes clean to make_page", {
+
+  yaml <- paste("---", "page1:", "---", sep="\n")
+  yaml_list <- yaml::yaml.load(yaml)
+  page_calls <- construct_page_calls(yaml_list, clean=TRUE)
+
+  single_call <- page_calls[[1]]
+  expect_identical(single_call[[1]], make_page)
+  expect_identical(single_call[["clean"]], TRUE)
+
+  # check the eval result
+  withr::with_tempdir({
+
+    # make the directory and put some stuff in it
+    page_name <- "page1"
+    dir.create(page_name)
+    writeLines("---\ntitle: old page\n---\n\nThis is the old page.",
+               file.path(page_name, "index.md"))
+    writeLines("Some other file", file.path(page_name, "other_file.txt"))
+
+    # sanity check, what's the state before evaluating the make_page call
+    expect_true(file.exists(file.path(page_name, "other_file.txt")))
+    expect_true(grepl("old", readLines(file.path(page_name, "index.md"))[[2]] ))
+
+    # evaluating the make_page call should replace everything
+    eval(single_call)
+    expect_false(file.exists(file.path(page_name, "other_file.txt")))
+    expect_false(grepl("old", readLines(file.path(page_name, "index.md"))[[2]] ))
+  })
+
+})
+
 test_that("construct_page_calls raises error for incorrect make_page arg names", {
 
   yaml <- paste("---",
@@ -283,6 +315,7 @@ test_that("construct_page_calls passes on args when there are multiple pages", {
   # double check that nothing goes wonky when we have multiple pages
   # just a snapshot so we don't have to update expect_identical() tests
   # of individual elements in multiple places
+  # also confirms that output_dir is respected when there are multiple pages
 
   yaml <- paste("---",
                 "page1:",
