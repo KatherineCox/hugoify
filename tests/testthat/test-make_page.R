@@ -170,13 +170,13 @@ test_that("make_page handles page params", {
 
   # no params should have empty yaml header
   dir <- withr::local_tempdir()
-  make_page("params_no", output_dir = dir)
+  withr::with_dir(dir, make_page("params_no"))
   expect_snapshot_file(file.path(dir, "params_no", "index.md"), name="params_no.md")
 
   # params are written to the yaml header
   dir <- withr::local_tempdir()
-  make_page("params_yes", output_dir = dir,
-            params=list(param1="first param", param2="second param") )
+  withr::with_dir(dir, make_page("params_yes",params=list(param1="first param",
+                                                          param2="second param") ))
   expect_snapshot_file(file.path(dir, "params_yes", "index.md"), name="params_yes.md")
 })
 
@@ -184,14 +184,57 @@ test_that("make_page handles page content", {
 
   # no content should have empty body
   dir <- withr::local_tempdir()
-  make_page("content_no", output_dir = dir)
+  withr::with_dir(dir, make_page("content_no"))
   expect_snapshot_file(file.path(dir, "content_no", "index.md"), name="content_no.md")
 
   # content is written to the body
   dir <- withr::local_tempdir()
-  make_page("content_yes", output_dir = dir,
-            content="This page was written by make_page()." )
+  withr::with_dir(dir, make_page("content_yes",
+                                 content="This page was written by make_page()."))
   expect_snapshot_file(file.path(dir, "content_yes", "index.md"), name="content_yes.md")
+})
+
+test_that("make_page copies character resources", {
+
+  # resources of type character should be handles as paths
+  # the file(s) should be copied over into the page bundle
+
+  # a single file
+  withr::with_tempdir({
+    writeLines("Some other file", "other_file.txt")
+    make_page("single_file", resources="other_file.txt")
+    expect_true(file.exists(file.path("single_file", "other_file.txt")))
+  })
+
+  # a file in a directory - should strip off all but the file name
+  withr::with_tempdir({
+    dir.create("foo")
+    writeLines("Some other file", file.path("foo", "other_file.txt"))
+    make_page("nested_file", resources=file.path("foo", "other_file.txt"))
+    expect_true(file.exists(file.path("nested_file", "other_file.txt")))
+  })
+
+  # multiple files
+  withr::with_tempdir({
+    writeLines("File 1", "file1.txt")
+    writeLines("File 2", "file2.txt")
+    make_page("multiple_files", resources=c("file1.txt", "file2.txt"))
+    expect_true(file.exists(file.path("multiple_files", "file1.txt")))
+    expect_true(file.exists(file.path("multiple_files", "file2.txt")))
+  })
+
+  # directory - should copy the whole directory
+  withr::with_tempdir({
+    dir.create("foo")
+    writeLines("File 1", file.path("foo", "file1.txt"))
+    writeLines("File 2", file.path("foo", "file2.txt"))
+    make_page("directory", resources="foo")
+    expect_true(file.exists(file.path("directory", "foo", "file1.txt")))
+    expect_true(file.exists(file.path("directory", "foo", "file2.txt")))
+  })
+
+  # expressions should be called from within the page's output_dir
+
 })
 
 test_that("make_test_page produces expected output", {

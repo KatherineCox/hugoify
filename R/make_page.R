@@ -6,7 +6,7 @@
 # TODO: add markdown to default make_test_page content?
 
 make_page <- function(page_name, output_dir = ".", clean=FALSE,
-                      params=list(),  content=NULL,
+                      params=list(),  content=NULL, resources=list(),
                       is_list_page=FALSE, bundle=TRUE) {
 
   # list pages must be bundles
@@ -60,9 +60,24 @@ make_page <- function(page_name, output_dir = ".", clean=FALSE,
     }
   }
 
-  # write file
+  # write index file
   write_md( yaml = params, content=content,
             filename = output_file, output_dir = output_dir)
+
+  # copy or create page resources
+  for (r in resources) {
+
+    # if it's a path, copy over the contents
+    if (typeof(r) == "character") {
+      file.copy(r, file.path(output_dir), recursive=TRUE)
+    }
+
+  #   # if it's an expression, evaluate it from the page's directory
+  #   else if (is.language(r)) {
+  #     withr::with_dir(output_dir, eval(r))
+  #   }
+
+  }
 
   invisible(page_name)
 
