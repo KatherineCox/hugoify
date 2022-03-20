@@ -33,7 +33,7 @@ make_page <- function(page_name, output_dir = ".", clean=FALSE,
         unlink(output_dir, recursive = TRUE)
       } else {
         stop("' ", output_dir, "' already exists.\n",
-             "To overwrite existing directories, set 'clean=TRUE'")
+             "To overwrite existing pages, set 'clean=TRUE'")
       }
     }
 
@@ -56,7 +56,7 @@ make_page <- function(page_name, output_dir = ".", clean=FALSE,
       unlink(f)
     } else {
       stop("' ", f, "' already exists.\n",
-           "To overwrite existing files, set 'clean=TRUE'")
+           "To overwrite existing pages, set 'clean=TRUE'")
     }
   }
 

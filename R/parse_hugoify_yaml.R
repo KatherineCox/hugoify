@@ -107,7 +107,7 @@ construct_page_calls <- function( yaml_list, output_dir = "." ) {
   # this is read in by yaml::yaml.load as a character vector (not list)
   if (typeof(yaml_list) == "character") {
     for (page in yaml_list) {
-      call_args <- list( make_page, page_name = page )
+      call_args <- list( make_page, page_name = page, output_dir = output_dir )
       # add the call for this page to the end of the list of page calls
       page_calls[[length(page_calls) + 1]] <- as.call(call_args)
     }
@@ -129,7 +129,7 @@ construct_page_calls <- function( yaml_list, output_dir = "." ) {
 
       # construct the call for this page by adding the function and page_name
       # to the front of the args list
-      call_args <- c( list( make_page, page_name = page ), call_args)
+      call_args <- c( list( make_page, page_name = page, output_dir=output_dir), call_args)
 
       # add the call for this page to the end of the list of page calls
       page_calls[[length(page_calls) + 1]] <- as.call(call_args)

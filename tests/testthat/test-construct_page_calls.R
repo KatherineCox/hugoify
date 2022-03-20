@@ -1,5 +1,4 @@
 # TODO: test output_dir
-# TODO: test multiple pages with args
 
 test_that("construct_page_calls returns a list of calls", {
 
@@ -104,6 +103,41 @@ test_that("construct_page_calls handles multiple pages", {
 
 })
 
+test_that("construct_page_calls passes output_dir to make_page", {
+
+  # construct_page_calls should always pass on output_dir
+  # even if it was not provided
+  yaml <- paste("---", "page1:", "---", sep="\n")
+  yaml_list <- yaml::yaml.load(yaml)
+  page_calls <- construct_page_calls(yaml_list)
+
+  single_call <- page_calls[[1]]
+  expect_identical(single_call[[1]], make_page)
+  expect_identical(single_call[["output_dir"]],".")
+
+  # check the eval result
+  withr::with_tempdir({
+    eval(single_call)
+    expect_true( file.exists( file.path("page1", "index.md") ) )
+  })
+
+  # pass on an user-specified output_dir
+  yaml <- paste("---", "page1:", "---", sep="\n")
+  yaml_list <- yaml::yaml.load(yaml)
+  page_calls <- construct_page_calls(yaml_list, output_dir="foo")
+
+  single_call <- page_calls[[1]]
+  expect_identical(single_call[[1]], make_page)
+  expect_identical(single_call[["output_dir"]],"foo")
+
+  # check the eval result
+  withr::with_tempdir({
+    eval(single_call)
+    expect_true( file.exists( file.path("foo", "page1", "index.md") ) )
+  })
+
+})
+
 test_that("construct_page_calls raises error for incorrect make_page arg names", {
 
   yaml <- paste("---",
@@ -130,8 +164,8 @@ test_that("construct_page_calls only adds args that are in the yaml", {
   single_call <- page_calls[[1]]
 
   absent_args <- names(formals(make_page))
-  # page_name *should* be present, so take it off this list
-  absent_args <- absent_args[ - match("page_name", absent_args) ]
+  # page_name and output_dir *should* be present, so take them off this list
+  absent_args <- absent_args[ - match(c("page_name", "output_dir"), absent_args) ]
 
   for (arg in  absent_args) {
     expect_false( arg %in% names(single_call) )
@@ -265,13 +299,13 @@ test_that("construct_page_calls passes on args when there are multiple pages", {
                 "  content: 'Content for page2.'",
                 "---", sep="\n")
   yaml_list <- yaml::yaml.load(yaml)
-  page_calls <- construct_page_calls(yaml_list)
+  page_calls <- construct_page_calls(yaml_list, output_dir="baz")
 
   # snapshot the eval result
   dir <- withr::local_tempdir()
   withr::with_dir(dir, lapply(page_calls, eval) )
-  expect_snapshot_file(file.path(dir, "page1", "index.md"), name="multi_page_multi_args1.md")
-  expect_snapshot_file(file.path(dir, "page2", "index.md"), name="multi_page_multi_args2.md")
+  expect_snapshot_file(file.path(dir, "baz", "page1", "index.md"), name="multi_page_multi_args1.md")
+  expect_snapshot_file(file.path(dir, "baz", "page2", "index.md"), name="multi_page_multi_args2.md")
 
 })
 
