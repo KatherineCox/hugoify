@@ -1,5 +1,3 @@
-# TODO: test output_dir
-
 test_that("construct_page_calls returns a list of calls", {
 
   # single page, no additional args

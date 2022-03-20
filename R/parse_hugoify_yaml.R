@@ -105,36 +105,36 @@ construct_page_calls <- function( yaml_list, output_dir = "." ) {
 
   # if we were only given page name(s) (i.e. no params, children, etc.)
   # this is read in by yaml::yaml.load as a character vector (not list)
+  # reformat it as a list where the names are the page names
+  # and the values are empty lists
   if (typeof(yaml_list) == "character") {
-    for (page in yaml_list) {
-      call_args <- list( make_page, page_name = page, output_dir = output_dir )
-      # add the call for this page to the end of the list of page calls
-      page_calls[[length(page_calls) + 1]] <- as.call(call_args)
+    # hold on to the old values and make a new yaml_list
+    yaml_char <- yaml_list
+    yaml_list <- list()
+    for (page in yaml_char) {
+      yaml_list[[page]] <- list()
     }
   }
 
-  else if (typeof(yaml_list) == "list") {
+  for ( page in names(yaml_list) ) {
 
-    for ( page in names(yaml_list) ) {
+    call_args <- yaml_list[[page]]
 
-      call_args <- yaml_list[[page]]
-
-      # verify the arguments are valid
-      for (arg in names(call_args)) {
-        if (! (arg %in% names(formals(make_page))) ) {
-          stop("Cannot construct call for page '", page, "'\n",
-               "'", arg, "' is not a valid argument to make_page.")
-        }
+    # verify the arguments are valid
+    for (arg in names(call_args)) {
+      if (! (arg %in% names(formals(make_page))) ) {
+        stop("Cannot construct call for page '", page, "'\n",
+             "'", arg, "' is not a valid argument to make_page.")
       }
-
-      # construct the call for this page by adding the function and page_name
-      # to the front of the args list
-      call_args <- c( list( make_page, page_name = page, output_dir=output_dir), call_args)
-
-      # add the call for this page to the end of the list of page calls
-      page_calls[[length(page_calls) + 1]] <- as.call(call_args)
-
     }
+
+    # construct the call for this page by adding the function and page_name
+    # to the front of the args list
+    call_args <- c( list( make_page, page_name = page, output_dir=output_dir), call_args)
+
+    # add the call for this page to the end of the list of page calls
+    page_calls[[length(page_calls) + 1]] <- as.call(call_args)
+
   }
 
   page_calls
