@@ -194,7 +194,7 @@ test_that("make_page handles page content", {
   expect_snapshot_file(file.path(dir, "content_yes", "index.md"), name="content_yes.md")
 })
 
-test_that("make_page copies character resources", {
+test_that("make_page copies file resources", {
 
   # resources of type character should be handles as paths
   # the file(s) should be copied over into the page bundle
@@ -233,7 +233,22 @@ test_that("make_page copies character resources", {
     expect_true(file.exists(file.path("directory", "foo", "file2.txt")))
   })
 
-  # expressions should be called from within the page's output_dir
+})
+
+test_that("make_page evaluates expression resources", {
+
+  # expressions should be evaluated from within the page's output_dir
+  withr::with_tempdir({
+    resource_exp <- call("writeLines", "Some other file", "other_file.txt")
+    make_page("expression_resource", resources=resource_exp)
+    expect_true(file.exists(file.path("expression_resource", "other_file.txt")))
+  })
+
+})
+
+test_that("make_page handles mixed resources", {
+
+  # confirm we can handle a messy mix of resource types
 
 })
 

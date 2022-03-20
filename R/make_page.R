@@ -6,7 +6,7 @@
 # TODO: add markdown to default make_test_page content?
 
 make_page <- function(page_name, output_dir = ".", clean=FALSE,
-                      params=list(),  content=NULL, resources=list(),
+                      params=list(),  content=NULL, resources=NULL,
                       is_list_page=FALSE, bundle=TRUE) {
 
   # list pages must be bundles
@@ -65,6 +65,14 @@ make_page <- function(page_name, output_dir = ".", clean=FALSE,
             filename = output_file, output_dir = output_dir)
 
   # copy or create page resources
+
+  # if we were passed a single expression (rather than a list of expressions)
+  # wrap it in a list
+  # otherwise it will try to iterate over the expression and break
+  if (is.language(resources)) {
+    resources <- list(resources)
+  }
+
   for (r in resources) {
 
     # if it's a path, copy over the contents
@@ -72,10 +80,10 @@ make_page <- function(page_name, output_dir = ".", clean=FALSE,
       file.copy(r, file.path(output_dir), recursive=TRUE)
     }
 
-  #   # if it's an expression, evaluate it from the page's directory
-  #   else if (is.language(r)) {
-  #     withr::with_dir(output_dir, eval(r))
-  #   }
+    # if it's an expression, evaluate it from the page's directory
+    else if (is.language(r)) {
+      withr::with_dir(output_dir, eval(r))
+    }
 
   }
 
