@@ -1,8 +1,4 @@
 # TODO: should we confirm that boolean args are, in fact, bools?
-# TODO: actually think about output_dir
-#       - I'm tossing it in right now so I can do snapshot testing in a tempdir
-#       - need to come back and do tests / figure out handling of overwriting
-# TODO: handle spaces in page_name. YAML permits spaces in keys
 # TODO: add markdown to default make_test_page content?
 
 make_page <- function(page_name, output_dir = ".", clean=FALSE,
@@ -13,6 +9,12 @@ make_page <- function(page_name, output_dir = ".", clean=FALSE,
   if (is_list_page==TRUE & bundle==FALSE) {
     stop("List pages must be bundles.\n",
          "'bundle' must not be FALSE if 'is_list_page' is TRUE")
+  }
+
+  # if a page has resources, it must be a bundle
+  if ( !is.null(resources) & bundle==FALSE) {
+    stop("A page cannot have resources if it is not a bundle.\n",
+         "'resources' must not be NULL if 'bundle' is FALSE")
   }
 
   # check if the output directory exists

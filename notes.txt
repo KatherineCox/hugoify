@@ -1,0 +1,149 @@
+This all started because I want a way to copy an image specified in the pages' params
+For now I'm not sure it's necessary to be able to compute content or params
+
+What if we made a hugoify_page class
+
+Currently make_page takes:
+
+make_page <- function(page_name, output_dir = ".", clean=FALSE,
+                      params=list(),  content=NULL, resources=NULL,
+                      is_list_page=FALSE, bundle=TRUE)
+
+
+is_list_page
+bundle
+
+children?
+
+
+What should a page object hold?
+- page_name - will be used to name the bundle or md page
+- params (list, possibly nested)
+- content (character vector)
+- resources
+
+-? children
+
+
+Page does not care about:
+- output_dir (where the page or bundle will be written)
+- clean
+
+function build_hugo_source
+- page object
+- output_dir (where the page or bundle will be written)
+- clean (how to handle existing stuff output_dir)
+?- recursive (whether to write children)
+
+function build_hugo_source
+- output_dir
+- clean
+
+function build_hugo_source (page)
+- bundle
+
+should bundle go in the class or in the build function?
+
+
+
+What if there's a hugoify_site class
+
+hugoify_site
+list(
+  - page1 (list (
+    - hugoify_page
+        - page_name - will be used to name the bundle or md page
+        - params (list, possibly nested)
+        - content (character vector)
+        - source_dir (optional, where to copy resources from)
+    - children (list of other hugoify_pages)
+    ))
+  - page2 (list(
+  ))
+
+
+resource functions
+
+# accept a string, copy file from source_dir to page bundle
+function (page) {
+  file.copy(file.path (page$source_dir, x), output_dir)
+}
+
+# access a param, copy file from source_dir to page bundle
+function (page) {
+  file.copy ( file.path (page$source_dir, page$params$x), output_dir)
+}
+
+# write a file in page bundle
+function (page) {
+  writeLines (x, output_dir)
+}
+
+construct_page_calls makes a closure
+- if it's a string "my_file.txt":
+
+function (page) {
+  file.copy(file.path (page$source_dir, "my_file.txt"), to=".")
+}
+
+- if it's tagged !param "image"
+function (page) {
+  file.copy ( file.path (page$source_dir, page$params$image), to=".")
+}
+
+an expression is quoted, and then evaluated in the pages directory
+expects a function that accepts the page object?
+or maybe captures all expressions and evaluateds them in the page dir
+but checks if it's a function with argument hugoify_page, and if so, supplies it
+
+or perhaps we use a different tag, since this behaves differently that !expr and we don't want to get tied up in expectations for similar behavior
+how about "!func"?
+
+!func is useful for
+- resources:
+  function (page) {
+    make_image(page$page_name)
+  }
+- content:
+  function (page) {
+    paste("This is the ", page$page_name, " page.")
+  }
+  could also build content from params, e.g. summary + learning objectives
+  - this might be an easier route to custom cards?  something to think about
+
+with a yaml tag, we don't actually need to decide whether or not to evaluate the function until later.  we just need to capture all !func objects as functions
+
+content - should be a string or a function that returns a string
+if (is function) {
+  md_content <- do.call(function, page)
+  }
+confirm md_content is a string, then pass to write_md
+
+resource - should always be a function
+do.call(function, page)
+
+
+
+a page has an output_dir field?
+perhaps only within the build function, then it gets deleted?
+or perhaps it defaults to ".", and gets updated within the build function?
+...I don't think the build function should modify the page object?
+should functions accept (page, output_dir)?
+perhaps it's fine if they just assume they're being run in the page's directory
+(i.e. the same directory that the .md file will be written to)
+
+
+what about when calling make_page by hand?
+we don't need functions for accessing params, we're creating them on the spot
+but it could still be nice to use an expression. e.g. writeLines()?
+
+
+Who gets to decide whether the page is a bundle?
+
+
+What's needed to make an S3 class?
+
+
+
+Maybe this is all unnecessary.
+Can hugoify() just apply a function that knows e.g. what files need to be copied?

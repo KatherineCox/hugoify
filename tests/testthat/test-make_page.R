@@ -3,6 +3,12 @@ test_that("make_page raises error for not bundling a list page", {
                regexp = "List pages must be bundles.")
 })
 
+test_that("make_page raises error for not bundling resources", {
+  writeLines("Some other file", "other_file.txt")
+  expect_error(make_page("resource_no_bundle", resource="other_file.txt" , bundle=FALSE),
+               regexp = "A page cannot have resources if it is not a bundle")
+})
+
 test_that("make_page raises error if bundle or page already exists", {
 
   # for page bundles (the default) check for the directory
@@ -249,6 +255,21 @@ test_that("make_page evaluates expression resources", {
 test_that("make_page handles mixed resources", {
 
   # confirm we can handle a messy mix of resource types
+  withr::with_tempdir({
+    dir.create("foo")
+    writeLines("File 1", file.path("foo", "file1.txt"))
+    resource_exp <- call("writeLines", "File 2", "file2.txt")
+    writeLines("File 3", "file3.txt")
+
+    resources <- list( file.path("foo", "file1.txt"),
+                       resource_exp,
+                       "file3.txt")
+
+    make_page("mixed_resources", resources=resources)
+    expect_true(file.exists(file.path("mixed_resources", "file1.txt")))
+    expect_true(file.exists(file.path("mixed_resources", "file2.txt")))
+    expect_true(file.exists(file.path("mixed_resources", "file3.txt")))
+  })
 
 })
 
