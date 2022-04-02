@@ -1,7 +1,7 @@
-new_hugoify_page <- function(){
+new_hugoify_page <- function( params=list(), content="" ){
   #efficiently creates new objects with the correct structure
-  page <- structure(list( params = list(),
-                          content = ""
+  page <- structure(list( params = params,
+                          content = content
                         ),
                     class = "hugoify_page")
   page
