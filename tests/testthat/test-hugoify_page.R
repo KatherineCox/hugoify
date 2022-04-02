@@ -51,6 +51,40 @@ test_that("new_hugoify_page handles page content", {
   expect_equal(p$content, test_content)
 })
 
-#### VALIDATOR ####
+#### VALIDATORS ####
+
+test_that("validate_hugoify_page raises error for missing fields", {
+  p <- new_hugoify_page()
+  p$params <- NULL
+  expect_error(validate_hugoify_page(p), regexp="Missing page params")
+
+  p <- new_hugoify_page()
+  p$content <- NULL
+  expect_error(validate_hugoify_page(p), regexp="Missing page content")
+})
+
+test_that("validate_hugoify_page raises error if content is not a string", {
+
+  char_content <- "some content"
+  num_content <- 1
+
+  # test *content* validator (helper)
+  # error for bad content
+  expect_error(validate_hugoify_page_content(num_content), regexp="Page content must be")
+  # no error for good content
+  expect_error(validate_hugoify_page_content(char_content), regexp=NA)
+
+
+  # test *page* validator
+  # error for bad content
+  p <- new_hugoify_page(content=num_content)
+  expect_error(validate_hugoify_page(p), regexp="Page content must be")
+  # no error for good content
+  p <- new_hugoify_page(content=char_content)
+  expect_error(validate_hugoify_page(p), regexp=NA)
+})
+
+test_that("validate_hugoify_page raises error for invalid params", {
+})
 
 #### USER FACING ####
