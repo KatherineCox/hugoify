@@ -140,10 +140,11 @@ but it could still be nice to use an expression. e.g. writeLines()?
 
 Who gets to decide whether the page is a bundle?
 
-
-What's needed to make an S3 class?
-
-
+Who sanitizes the page_name?  The user helper function? or should that happen at build?
+  - perhaps at build - makes sure the file is named appropriately just-in-time
+  - allows page <-> yaml to keep unholy page names
+  - disallows bad page names in the hugo source, but, I think that's not a problem?  why would you want them?  won't they just cause problems?
+  - if somebody really wants it, we can add in a flag to turn off sanitizing
 
 Maybe this is all unnecessary.
 Can hugoify() just apply a function that knows e.g. what files need to be copied?

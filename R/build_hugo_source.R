@@ -1,7 +1,14 @@
-build_hugo_source <- function(page, output_dir=".", bundle=TRUE){
+build_hugo_source <- function(page, output_dir=".",
+                              is_list_page=FALSE, bundle=TRUE){
 
   if(!inherits(page, "hugoify_page")) {
     stop("'page' must be a 'hugoify_page' object.")
+  }
+
+  # list pages must be bundles
+  if (is_list_page==TRUE & bundle==FALSE) {
+    stop("List pages must be bundles.\n",
+         "'bundle' must not be FALSE if 'is_list_page' is TRUE")
   }
 
   validate_hugoify_page(page)
@@ -31,8 +38,8 @@ build_hugo_source <- function(page, output_dir=".", bundle=TRUE){
   # determine name of output file
   if (bundle==FALSE) {
     output_file <- paste0(page_name, ".md")
-  # } else if (is_list_page) {
-  #   output_file <- "_index.md"
+  } else if (is_list_page) {
+    output_file <- "_index.md"
   } else {
     output_file <- "index.md"
   }

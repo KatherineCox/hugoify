@@ -6,10 +6,6 @@
 #                       is_list_page=FALSE, bundle=TRUE) {
 #
 #   # list pages must be bundles
-#   if (is_list_page==TRUE & bundle==FALSE) {
-#     stop("List pages must be bundles.\n",
-#          "'bundle' must not be FALSE if 'is_list_page' is TRUE")
-#   }
 #
 #   # if a page has resources, it must be a bundle
 #   if ( !is.null(resources) & bundle==FALSE) {

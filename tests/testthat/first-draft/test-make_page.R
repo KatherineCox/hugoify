@@ -1,8 +1,5 @@
-# test_that("make_page raises error for not bundling a list page", {
-#   expect_error(make_page("list_no_bundle", is_list_page=TRUE, bundle=FALSE),
-#                regexp = "List pages must be bundles.")
-# })
-#
+# ** raises error for not bundling a list page **
+
 # test_that("make_page raises error for not bundling resources", {
 #   writeLines("Some other file", "other_file.txt")
 #   expect_error(make_page("resource_no_bundle", resource="other_file.txt" , bundle=FALSE),
