@@ -72,6 +72,47 @@ test_that("build_hugo_source sanitizes page names", {
 
 })
 
+test_that("build_hugo_source respects output_dir", {
+
+  # if it's a bundle, expect an index.md inside the bundle directory
+  withr::with_tempdir({
+    dir.create("foo")
+    p <- new_hugoify_page("yes_bundle")
+    build_hugo_source(p, output_dir="foo")
+    expect_true( file.exists( file.path("foo", "yes_bundle", "index.md") ) )
+  })
+
+  # if it's not a bundle, expect a named md file
+  withr::with_tempdir({
+    dir.create("foo")
+    p <- new_hugoify_page("no_bundle")
+    build_hugo_source(p, output_dir="foo", bundle=FALSE)
+    expect_true( file.exists( file.path("foo", "no_bundle.md") ) )
+  })
+
+})
+
+test_that("make_page creates non-existent output_dir", {
+
+  withr::with_tempdir({
+    p <- new_hugoify_page("yes_bundle")
+    build_hugo_source(p, output_dir="foo")
+    expect_true( dir.exists("foo") )
+    expect_true( dir.exists( file.path("foo", "yes_bundle") ) )
+    expect_true( file.exists( file.path("foo", "yes_bundle", "index.md") ) )
+  })
+#
+#   # recursive
+#   withr::with_tempdir({
+#     make_page("yes_bundle", output_dir=file.path("foo", "bar"))
+#     expect_true( dir.exists("foo") )
+#     expect_true( dir.exists( file.path("foo", "bar") ) )
+#     expect_true( dir.exists( file.path("foo", "bar", "yes_bundle") ) )
+#     expect_true( file.exists( file.path("foo", "bar", "yes_bundle", "index.md") ) )
+#   })
+#
+})
+
 test_that("sanitize_page_name replaces spaces", {
   expect_identical("no-spaces-here", sanitize_page_name("no spaces here") )
 })

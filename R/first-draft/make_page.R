@@ -13,10 +13,7 @@
 #          "'resources' must not be NULL if 'bundle' is FALSE")
 #   }
 #
-#   # check if the output directory exists
-#   if (! dir.exists(output_dir) ) {
-#     dir.create(output_dir, recursive=TRUE)
-#   }
+#   # create output directory if necessary
 #
 #   # clean up the page name
 #
@@ -38,7 +35,6 @@
 #   # write index file
 #
 #   # copy or create page resources
-#
 #   # if we were passed a single expression (rather than a list of expressions)
 #   # wrap it in a list
 #   # otherwise it will try to iterate over the expression and break

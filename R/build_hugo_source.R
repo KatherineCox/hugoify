@@ -13,7 +13,12 @@ build_hugo_source <- function(page, output_dir=".",
 
   validate_hugoify_page(page)
 
-  # it's a valid page, so we can build it
+  # if we get past the validator, it's a valid page, so we can build it
+
+  # create output directory if necessary
+  if (! dir.exists(output_dir) ) {
+    dir.create(output_dir, recursive=TRUE)
+  }
 
   # sanitize page name
   page_name <- sanitize_page_name(page$page_name)
