@@ -27,13 +27,6 @@
 #   # create the page directory
 #
 #   # determine name of output file
-#   if (bundle==FALSE) {
-#     output_file <- paste0(page_name, ".md")
-#   } else if (is_list_page) {
-#     output_file <- "_index.md"
-#   } else {
-#     output_file <- "index.md"
-#   }
 #
 #   # confirm that this file doesn't already exist (unless clean=TRUE)
 #   f <- file.path(output_dir, output_file)
@@ -47,8 +40,6 @@
 #   }
 #
 #   # write index file
-#   write_md( yaml = params, content=content,
-#             filename = output_file, output_dir = output_dir)
 #
 #   # copy or create page resources
 #

@@ -45,37 +45,9 @@
 #
 # ** creates directory if needed **
 #
-# test_that("make_page creates a file with the correct name and location", {
+# ** creates a file with the correct name and location **
 #
-#   # if it's a bundle, expect an index.md inside the bundle directory
-#   withr::with_tempdir({
-#     make_page("yes_bundle")
-#     expect_true( file.exists( file.path("yes_bundle", "index.md") ) )
-#   })
-#
-#   # if it's not a bundle, expect a named md file
-#   withr::with_tempdir({
-#     make_page("no_bundle", bundle=FALSE)
-#     expect_true( file.exists("no_bundle.md") )
-#   })
-#
-#   # if it's a list page, expect an _index.md inside the bundle directory
-#   withr::with_tempdir({
-#     make_page("list", is_list_page=TRUE)
-#     expect_true( file.exists( file.path("list", "_index.md") ) )
-#   })
-#
-# })
-#
-# test_that("make_page handles wonky page names", {
-#
-#   # spaces in name
-#   withr::with_tempdir({
-#     make_page("yes bundle")
-#     expect_true( file.exists( file.path("yes-bundle", "index.md") ) )
-#   })
-#
-# })
+# ** handles wonky page names **
 #
 # test_that("make_page replaces old pages if clean=TRUE", {
 #

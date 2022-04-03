@@ -28,6 +28,19 @@ build_hugo_source <- function(page, output_dir=".", bundle=TRUE){
     dir.create(output_dir)
   }
 
+  # determine name of output file
+  if (bundle==FALSE) {
+    output_file <- paste0(page_name, ".md")
+  # } else if (is_list_page) {
+  #   output_file <- "_index.md"
+  } else {
+    output_file <- "index.md"
+  }
+
+  # write index file
+  write_md( yaml = params, content=content,
+            filename = output_file, output_dir = output_dir)
+
   invisible(page)
 }
 
