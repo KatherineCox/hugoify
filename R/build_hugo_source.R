@@ -1,4 +1,4 @@
-build_hugo_source <- function(page){
+build_hugo_source <- function(page, output_dir=".", bundle=TRUE){
 
   if(!inherits(page, "hugoify_page")) {
     stop("'page' must be a 'hugoify_page' object.")
@@ -9,24 +9,24 @@ build_hugo_source <- function(page){
   # it's a valid page, so we can build it
 
   # sanitize page name
-  # page_name <- sanitize_page_name(page$page_name)
+  page_name <- sanitize_page_name(page$page_name)
 
   # create the page bundle directory
-  #   if (bundle) {
-  #     output_dir <- file.path(output_dir, page_name)
-  #
-  #     # check if it already exists
-  #     if ( dir.exists(output_dir) ) {
-  #       if (clean) {
-  #         unlink(output_dir, recursive = TRUE)
-  #       } else {
-  #         stop("' ", output_dir, "' already exists.\n",
-  #              "To overwrite existing pages, set 'clean=TRUE'")
-  #       }
+  if (bundle) {
+    output_dir <- file.path(output_dir, page_name)
+
+  #   # check if it already exists
+  #   if ( dir.exists(output_dir) ) {
+  #     if (clean) {
+  #       unlink(output_dir, recursive = TRUE)
+  #     } else {
+  #       stop("' ", output_dir, "' already exists.\n",
+  #            "To overwrite existing pages, set 'clean=TRUE'")
   #     }
-  #
-  #     dir.create(output_dir)
   #   }
+
+    dir.create(output_dir)
+  }
 
   invisible(page)
 }
