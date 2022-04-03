@@ -38,7 +38,7 @@ build_hugo_source <- function(page, output_dir=".", bundle=TRUE){
   }
 
   # write index file
-  write_md( yaml = params, content=content,
+  write_md( #yaml = params, content=content,
             filename = output_file, output_dir = output_dir)
 
   invisible(page)

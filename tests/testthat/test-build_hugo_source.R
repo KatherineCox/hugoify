@@ -37,19 +37,21 @@ test_that("build_hugo_source creates a file with the correct name and location",
     build_hugo_source(p)
     expect_true( file.exists( file.path("yes_bundle", "index.md") ) )
   })
-#
-#   # if it's not a bundle, expect a named md file
-#   withr::with_tempdir({
-#     make_page("no_bundle", bundle=FALSE)
-#     expect_true( file.exists("no_bundle.md") )
-#   })
-#
-#   # if it's a list page, expect an _index.md inside the bundle directory
-#   withr::with_tempdir({
-#     make_page("list", is_list_page=TRUE)
-#     expect_true( file.exists( file.path("list", "_index.md") ) )
-#   })
-#
+
+  # if it's not a bundle, expect a named md file
+  withr::with_tempdir({
+    p <- new_hugoify_page("no_bundle")
+    build_hugo_source(p, bundle=FALSE)
+    expect_true( file.exists("no_bundle.md") )
+  })
+
+  # if it's a list page, expect an _index.md inside the bundle directory
+  withr::with_tempdir({
+    p <- new_hugoify_page("list")
+    build_hugo_source(p, is_list_page=TRUE)
+    expect_true( file.exists( file.path("list", "_index.md") ) )
+  })
+
 })
 
 test_that("build_hugo_source sanitizes page names", {
