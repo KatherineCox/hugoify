@@ -1,5 +1,15 @@
-new_hugoify_page <- function( params=list(), content="" ){
-  page <- structure(list( params = params,
+new_hugoify_page <- function( page_name, params=list(), content="" ){
+
+  # error if page_name isn't character
+  if (!is.character(page_name)) {
+    stop("page_name must be of type 'character'.")
+  }
+  if ( !( length(page_name)==1 ) ) {
+    stop("page_name must be a character vector of length 1.")
+  }
+
+  page <- structure(list( page_name = page_name,
+                          params = params,
                           content = content
                         ),
                     class = "hugoify_page")
@@ -8,10 +18,10 @@ new_hugoify_page <- function( params=list(), content="" ){
 
 validate_hugoify_page <- function(page){
   # Check that it has the correct fields
-  fields <- c("params", "content")
+  fields <- c("page_name", "params", "content")
   for (f in fields) {
     if (! (f %in% names(page))) {
-      stop("Missing page ", f, call. = FALSE)
+      stop("Missing ", f, " for page '", page$page_name, "'.", call. = FALSE)
     }
   }
   #

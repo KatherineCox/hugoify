@@ -43,19 +43,7 @@
 #
 # })
 #
-# test_that("make_page creates a bundle directory if needed", {
-#
-#   withr::with_tempdir({
-#     make_page("yes_bundle")
-#     expect_true( dir.exists("yes_bundle") )
-#   })
-#
-#   withr::with_tempdir({
-#     make_page("no_bundle", bundle=FALSE)
-#     expect_false( dir.exists("no_bundle") )
-#   })
-#
-# })
+# ** creates directory if needed **
 #
 # test_that("make_page creates a file with the correct name and location", {
 #
@@ -281,8 +269,4 @@
 # #   expect_snapshot_file(file.path(dir, "default_test_page", "index.md"), name="default_test_page.md")
 # #
 # })
-#
-# test_that("sanitize_page_name replaces spaces", {
-#   expect_identical("no-spaces-here", sanitize_page_name("no spaces here") )
-# })
-#
+

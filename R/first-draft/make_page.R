@@ -23,24 +23,8 @@
 #   }
 #
 #   # clean up the page name
-#   page_name <- sanitize_page_name(page_name)
 #
 #   # create the page directory
-#   if (bundle) {
-#     output_dir <- file.path(output_dir, page_name)
-#
-#     # check if it already exists
-#     if ( dir.exists(output_dir) ) {
-#       if (clean) {
-#         unlink(output_dir, recursive = TRUE)
-#       } else {
-#         stop("' ", output_dir, "' already exists.\n",
-#              "To overwrite existing pages, set 'clean=TRUE'")
-#       }
-#     }
-#
-#     dir.create(output_dir)
-#   }
 #
 #   # determine name of output file
 #   if (bundle==FALSE) {
@@ -102,10 +86,3 @@
 # #
 # #   make_page(page_name, params=params, content=content, ...)
 # # }
-#
-# sanitize_page_name <- function(page_name) {
-#   # yaml allows spaces in key names
-#   # replace spaces with underscores
-#   page_name <- gsub(" ", "-", page_name)
-#   page_name
-# }
