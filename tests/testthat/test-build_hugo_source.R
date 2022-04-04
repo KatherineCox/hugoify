@@ -92,7 +92,7 @@ test_that("build_hugo_source respects output_dir", {
 
 })
 
-test_that("make_page creates non-existent output_dir", {
+test_that("build_hugo_source creates non-existent output_dir", {
 
   withr::with_tempdir({
     p <- new_hugoify_page("yes_bundle")
@@ -101,16 +101,49 @@ test_that("make_page creates non-existent output_dir", {
     expect_true( dir.exists( file.path("foo", "yes_bundle") ) )
     expect_true( file.exists( file.path("foo", "yes_bundle", "index.md") ) )
   })
-#
-#   # recursive
-#   withr::with_tempdir({
-#     make_page("yes_bundle", output_dir=file.path("foo", "bar"))
-#     expect_true( dir.exists("foo") )
-#     expect_true( dir.exists( file.path("foo", "bar") ) )
-#     expect_true( dir.exists( file.path("foo", "bar", "yes_bundle") ) )
-#     expect_true( file.exists( file.path("foo", "bar", "yes_bundle", "index.md") ) )
-#   })
-#
+
+  # recursive
+  withr::with_tempdir({
+    p <- new_hugoify_page("yes_bundle")
+    build_hugo_source(p, output_dir=file.path("foo", "bar"))
+    expect_true( dir.exists("foo") )
+    expect_true( dir.exists( file.path("foo", "bar") ) )
+    expect_true( dir.exists( file.path("foo", "bar", "yes_bundle") ) )
+    expect_true( file.exists( file.path("foo", "bar", "yes_bundle", "index.md") ) )
+  })
+
+})
+
+test_that("build_hugo_source handles page params", {
+
+  # no params should have empty yaml header
+  p <- new_hugoify_page("params_no")
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, build_hugo_source(p))
+  expect_snapshot_file(file.path(dir, "params_no", "index.md"), name="params_no.md")
+
+  # params are written to the yaml header
+  p <- new_hugoify_page("params_yes", params=list(param1="first param",
+                                                  param2="second param"))
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, build_hugo_source(p))
+  expect_snapshot_file(file.path(dir, "params_yes", "index.md"), name="params_yes.md")
+})
+
+test_that("build_hugo_source handles page content", {
+
+  # no content should have empty body
+  p <- new_hugoify_page("content_no")
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, build_hugo_source(p))
+  expect_snapshot_file(file.path(dir, "content_no", "index.md"), name="content_no.md")
+
+  # content is written to the body
+  p <- new_hugoify_page("content_yes",
+                        content="This page was written by build_hugo_source().")
+  dir <- withr::local_tempdir()
+  withr::with_dir(dir, build_hugo_source(p))
+  expect_snapshot_file(file.path(dir, "content_yes", "index.md"), name="content_yes.md")
 })
 
 test_that("sanitize_page_name replaces spaces", {

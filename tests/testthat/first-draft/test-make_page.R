@@ -92,33 +92,8 @@
 # ** respects output dir **
 # ** creates non-existent output_dir **
 #
-# test_that("make_page handles page params", {
-#
-#   # no params should have empty yaml header
-#   dir <- withr::local_tempdir()
-#   withr::with_dir(dir, make_page("params_no"))
-#   expect_snapshot_file(file.path(dir, "params_no", "index.md"), name="params_no.md")
-#
-#   # params are written to the yaml header
-#   dir <- withr::local_tempdir()
-#   withr::with_dir(dir, make_page("params_yes",params=list(param1="first param",
-#                                                           param2="second param") ))
-#   expect_snapshot_file(file.path(dir, "params_yes", "index.md"), name="params_yes.md")
-# })
-#
-# test_that("make_page handles page content", {
-#
-#   # no content should have empty body
-#   dir <- withr::local_tempdir()
-#   withr::with_dir(dir, make_page("content_no"))
-#   expect_snapshot_file(file.path(dir, "content_no", "index.md"), name="content_no.md")
-#
-#   # content is written to the body
-#   dir <- withr::local_tempdir()
-#   withr::with_dir(dir, make_page("content_yes",
-#                                  content="This page was written by make_page()."))
-#   expect_snapshot_file(file.path(dir, "content_yes", "index.md"), name="content_yes.md")
-# })
+# ** handles page params **
+# ** handles page content **
 #
 # test_that("make_page copies file resources", {
 #
