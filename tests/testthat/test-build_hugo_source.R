@@ -19,6 +19,12 @@ test_that("build_hugo_source raises error for not bundling a list page", {
   })
 })
 
+test_that("build_hugo_source validates page", {
+  # should get an error if we try to build a page with no page_name
+  p <- new_hugoify_page("my_page")
+  p$page_name <- NULL
+  expect_error(build_hugo_source(p), regexp="Missing page_name")
+})
 
 test_that("build_hugo_source creates a bundle directory if needed", {
 

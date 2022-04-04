@@ -34,7 +34,7 @@ validate_hugoify_page <- function(page){
 
 validate_hugoify_page_content <- function(page_content) {
   if (!is.character(page_content)) {
-    stop("Page content must be of type 'character'")
+    stop("Page content must be of type 'character'", call. = FALSE)
   }
 }
 
