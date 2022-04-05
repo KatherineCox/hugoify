@@ -46,13 +46,18 @@ new_hugoify_site_content <- function(page, is_list_page=NULL, bundle=NULL, child
 
 validate_hugoify_site_content <- function(site_content){
 
-  # # Check that it has the correct fields
-  # fields <- c("page", "build_opts", "children")
-  # for (f in fields) {
-  #   if (! (f %in% names(page))) {
-  #     stop("Missing ", f, " for page '", site_content$page$page_name, "'.", call. = FALSE)
-  #   }
-  # }
+  # error if page isn't a hugoify_site_content object
+  if (!inherits(site_content, "hugoify_site_content")) {
+    stop("Object is not of class 'hugoify_site_content'.", call. = FALSE)
+  }
+
+  # Check that it has the correct fields
+  fields <- c("page", "build_opts", "children")
+  for (f in fields) {
+    if (! (f %in% names(site_content))) {
+      stop("Missing ", f, " for page '", site_content$page$page_name, "'.", call. = FALSE)
+    }
+  }
   #
   # # validate_hugoify_page_(site_content$page)
   #

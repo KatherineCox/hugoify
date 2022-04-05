@@ -72,6 +72,10 @@ test_that("validate_hugoify_page raises error if not a hugoify_page", {
 
 test_that("validate_hugoify_page raises error for missing fields", {
 
+  # no error if all fields are present
+  p <- new_hugoify_page("my_page")
+  expect_error(validate_hugoify_page(p), regexp=NA)
+
   p <- new_hugoify_page("my_page")
   p$page_name <- NULL
   expect_error(validate_hugoify_page(p), regexp="Missing page_name")
