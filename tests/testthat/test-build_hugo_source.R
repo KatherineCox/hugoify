@@ -1,16 +1,3 @@
-test_that("build_hugo_source raises error if 'page' is not a hugoify_page", {
-  # error if not a page
-  withr::with_tempdir({
-    expect_error(build_hugo_source(1), regexp="'page' must be a 'hugoify_page' object")
-  })
-
-  # no error if it is a page
-  withr::with_tempdir({
-    p <- new_hugoify_page("my_page")
-    expect_error(build_hugo_source(p), regexp=NA)
-  })
-})
-
 test_that("build_hugo_source raises error for not bundling a list page", {
   withr::with_tempdir({
     p <- new_hugoify_page("my_page")

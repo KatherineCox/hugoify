@@ -1,10 +1,6 @@
 build_hugo_source <- function(page, output_dir=".",
                               is_list_page=FALSE, bundle=TRUE){
 
-  if(!inherits(page, "hugoify_page")) {
-    stop("'page' must be a 'hugoify_page' object.")
-  }
-
   # list pages must be bundles
   if (is_list_page==TRUE & bundle==FALSE) {
     stop("List pages must be bundles.\n",

@@ -1,3 +1,6 @@
+# a hugoify_page holds the content for the page (including its resources)
+# it doesn't care about the site directory structure
+
 new_hugoify_page <- function( page_name, params=list(), content="" ){
 
   # error if page_name isn't character
@@ -17,6 +20,12 @@ new_hugoify_page <- function( page_name, params=list(), content="" ){
 }
 
 validate_hugoify_page <- function(page){
+
+  # error if page isn't a hugoify_page
+  if (!inherits(page, "hugoify_page")) {
+    stop("Object is not of class 'hugoify_page'.", call. = FALSE)
+  }
+
   # Check that it has the correct fields
   fields <- c("page_name", "params", "content")
   for (f in fields) {
@@ -24,7 +33,7 @@ validate_hugoify_page <- function(page){
       stop("Missing ", f, " for page '", page$page_name, "'.", call. = FALSE)
     }
   }
-  #
+
   # validate_hugoify_page_params(page$params)
 
   validate_hugoify_page_content(page$content)
@@ -39,5 +48,17 @@ validate_hugoify_page_content <- function(page_content) {
 }
 
 hugoify_page <- function(){
-  # that provides a convenient way for others to create objects of your class.
+  # hugoify_page(, build=FALSE, ... passed to build_hugo_source)
+
+  #provides a convenient way for others to create objects of your class.
+
+  # page <- new_hugoify_page()
+  #
+  # validate_hugoify_page(page)
+  #
+  # if (build) {
+  #   return(build_hugo_source(page, ...))
+  # }
+  #
+  # page
 }

@@ -64,6 +64,12 @@ test_that("new_hugoify_page handles page content", {
 
 #### VALIDATORS ####
 
+test_that("validate_hugoify_page raises error if not a hugoify_page", {
+  p <- new_hugoify_page("my_page")
+  class(p) <- NULL
+  expect_error(validate_hugoify_page(p), regexp="Object is not of class 'hugoify_page'")
+})
+
 test_that("validate_hugoify_page raises error for missing fields", {
 
   p <- new_hugoify_page("my_page")
