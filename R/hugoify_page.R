@@ -1,6 +1,9 @@
 # a hugoify_page holds the content for the page (including its resources)
 # it doesn't care about the site directory structure
 
+# TODO: validate_hugoify_page_name(page$page_name)
+# TODO: validate_hugoify_page_params(page$params)
+
 new_hugoify_page <- function( page_name, params=list(), content="" ){
 
   # error if page_name isn't character
@@ -34,7 +37,9 @@ validate_hugoify_page <- function(page){
     }
   }
 
-  # validate_hugoify_page_params(page$params)
+  # TODO: validate_hugoify_page_name(page$page_name)
+
+  # TODO: validate_hugoify_page_params(page$params)
 
   validate_hugoify_page_content(page$content)
 

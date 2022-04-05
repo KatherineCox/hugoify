@@ -33,7 +33,7 @@ test_that("new_hugoify_page handles page params", {
   # no params should have an empty params list
   p <- new_hugoify_page("my_page")
   expect_type(p$params, "list" )
-  expect_length(p$params, 0)
+  expect_identical(p$params, list())
 
   # params are added to the page
   test_params=list(param1="first param", param2="second param")
