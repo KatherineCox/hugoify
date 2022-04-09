@@ -1,5 +1,15 @@
-build_hugo_source <- function(page, output_dir=".",
-                              is_list_page=FALSE, bundle=TRUE){
+# TODO: I am unclear on where I should specify the output_dir arg
+# - it seems to be least complicated for the S3 generic to only take x and ...
+# https://stackoverflow.com/questions/43717794/best-practice-for-defining-s3-methods-with-different-arguments
+# - but DRY - aren't all methods going to want an output_dir?
+# - also this fails to catch e.g. misspelled arguments - https://adv-r.hadley.nz/s3.html#s3-arguments
+
+build_hugo_source <- function(x, ...) {
+  UseMethod("build_hugo_source")
+}
+
+build_hugo_source.hugoify_page <- function(page, output_dir=".",
+                                           is_list_page=FALSE, bundle=TRUE){
 
   # list pages must be bundles
   if (is_list_page==TRUE & bundle==FALSE) {
@@ -8,8 +18,11 @@ build_hugo_source <- function(page, output_dir=".",
   }
 
   validate_hugoify_page(page)
+  # build_opts <- list(is_list_page = is_list_page,
+  #                    bundle = bundle)
+  # validate_page_build_opts(page, build_opts)
 
-  # if we get past the validator, it's a valid page, so we can build it
+  # if we get past the validators we can build it
 
   # create output directory if necessary
   if (! dir.exists(output_dir) ) {
