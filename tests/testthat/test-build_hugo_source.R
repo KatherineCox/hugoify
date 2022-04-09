@@ -139,6 +139,6 @@ test_that("build_hugo_source handles page content", {
   expect_snapshot_file(file.path(dir, "content_yes", "index.md"), name="content_yes.md")
 })
 
-test_that("sanitize_page_name replaces spaces", {
-  expect_identical("no-spaces-here", sanitize_page_name("no spaces here") )
+test_that("sanitize_name replaces spaces", {
+  expect_identical("no-spaces-here", sanitize_name("no spaces here") )
 })

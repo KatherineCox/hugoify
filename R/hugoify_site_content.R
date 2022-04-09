@@ -13,6 +13,9 @@
 # TODO: do we need to worry about preventing site_content objects from being children of themselves?
 # - is it possible to make a loop?  or will it always eventually terminate?
 
+# TODO: move gather_page_build_opts call into user helper function
+# - and have constructor accept a build_opts list
+
 new_hugoify_site_content <- function(page, is_list_page=NULL, bundle=NULL, children=list()){
 
   # error if page isn't a hugoify_page
@@ -32,19 +35,8 @@ new_hugoify_site_content <- function(page, is_list_page=NULL, bundle=NULL, child
     }
   }
 
-  # just pass these on, we'll check them in the validator
-  # adding them this way means they only get added if they're not null
-  page_build_opts <- list()
-  page_build_opts[["is_list_page"]] <- is_list_page
-  page_build_opts[["bundle"]] <- bundle
-
-
-  # TODO: try something like this instead?
-  # page_build_opts <- list()
-  # opts <- names(formals(build_hugo_source.hugoify_page)[[-"page"]])
-  # for (o in opts) {
-  #   page_build_opts[[o]] <- match.call()[[o]]
-  # }
+  # just pass these along, we'll check them in the validator
+  page_build_opts <- gather_page_build_opts(match.call())
 
   site_content <- structure(list(page = page,
                                  page_build_opts = page_build_opts,
@@ -97,8 +89,7 @@ gather_page_build_opts <- function(args_list){
   }
 
   # list the possible build options
-  # remove "page" argument
-  # we only want the build options for the page, not the page itself
+  # remove "page" argument - we only want the build options, not the page itself
   opts <- names(formals(build_hugo_source.hugoify_page))
   opts <- opts[-match("page", opts)]
 

@@ -4,6 +4,9 @@
 # - but DRY - aren't all methods going to want an output_dir?
 # - also this fails to catch e.g. misspelled arguments - https://adv-r.hadley.nz/s3.html#s3-arguments
 
+# TODO: think about organization
+# - should build_hugo_source.site_content be a wrapper for build_hugo_source.page, or vice versa
+
 build_hugo_source <- function(x, ...) {
   UseMethod("build_hugo_source")
 }
@@ -18,9 +21,12 @@ build_hugo_source.hugoify_page <- function(page, output_dir=".",
   }
 
   validate_hugoify_page(page)
-  # build_opts <- list(is_list_page = is_list_page,
-  #                    bundle = bundle)
-  # validate_page_build_opts(page, build_opts)
+
+  # make a site content object and validate it
+  # this will validate the page object itself, plus the build options
+  # page_build_opts <- gather_page_build_opts(match.call())
+  # site_content <- new_hugoify_site_content(page, page_build_opts)
+  # validate_hugoify_site_content(site_content)
 
   # if we get past the validators we can build it
 
@@ -30,7 +36,7 @@ build_hugo_source.hugoify_page <- function(page, output_dir=".",
   }
 
   # sanitize page name
-  page_name <- sanitize_page_name(page$page_name)
+  page_name <- sanitize_name(page$page_name)
 
   # create the page bundle directory
   if (bundle) {
@@ -65,9 +71,9 @@ build_hugo_source.hugoify_page <- function(page, output_dir=".",
   invisible(page)
 }
 
-sanitize_page_name <- function(page_name) {
+sanitize_name <- function(name) {
   # yaml allows spaces in key names
   # replace spaces with underscores
-  page_name <- gsub(" ", "-", page_name)
-  page_name
+  name <- gsub(" ", "-", name)
+  name
 }
