@@ -15,12 +15,19 @@
 
 # TODO: move gather_page_build_opts call into user helper function
 # - and have constructor accept a build_opts list
+# TODO: pages are also acceptable children?
 
-new_hugoify_site_content <- function(page, is_list_page=NULL, bundle=NULL, children=list()){
+new_hugoify_site_content <- function(page, page_build_opts=list(), children=list()){
 
   # error if page isn't a hugoify_page
   if (!inherits(page, "hugoify_page")) {
     stop("page must be a hugoify_page object.")
+  }
+
+  # error if page_build_opts is not a list
+  # otherwise, just pass them along, we'll check them in the validator
+  if (!is.list(page_build_opts)) {
+    stop("page_build_opts must be a list.")
   }
 
   # error if children is not a list
@@ -29,14 +36,11 @@ new_hugoify_site_content <- function(page, is_list_page=NULL, bundle=NULL, child
   }
 
   # error if children aren't hugoify_site_content objects
-  for (c in children) {
-    if (!inherits(c, "hugoify_site_content")) {
+  for (child in children) {
+    if (!inherits(child, "hugoify_site_content")) {
       stop("children must be hugoify_site_content objects.")
     }
   }
-
-  # just pass these along, we'll check them in the validator
-  page_build_opts <- gather_page_build_opts(match.call())
 
   site_content <- structure(list(page = page,
                                  page_build_opts = page_build_opts,
@@ -48,7 +52,7 @@ new_hugoify_site_content <- function(page, is_list_page=NULL, bundle=NULL, child
 
 validate_hugoify_site_content <- function(site_content){
 
-  # error if page isn't a hugoify_site_content object
+  # error if it isn't a hugoify_site_content object
   if (!inherits(site_content, "hugoify_site_content")) {
     stop("Object is not of class 'hugoify_site_content'.", call. = FALSE)
   }
@@ -63,7 +67,7 @@ validate_hugoify_site_content <- function(site_content){
 
   validate_hugoify_page(site_content$page)
 
-  # # validate_page_build_opts(site_content$page, site_content$page_build_opts)
+  # # validate_page_build_opts(site_content)
   #
   # # error if children is not a list
   # if (!is.list(children)) {
@@ -78,7 +82,13 @@ validate_hugoify_site_content <- function(site_content){
   invisible(site_content)
 }
 
-hugoify_site_content <- function(){
+hugoify_site_content <- function(page, is_list_page=NULL, bundle=NULL){
+
+  page_build_opts <- gather_page_build_opts(match.call())
+
+  site_content <- new_hugoify_site_content(page, page_build_opts)
+
+  site_content
 
 }
 
@@ -88,7 +98,7 @@ gather_page_build_opts <- function(args_list){
     stop("args_list should be a list or call")
   }
 
-  # list the possible build options
+  # list the possible build options (args to build_hugo_source)
   # remove "page" argument - we only want the build options, not the page itself
   opts <- names(formals(build_hugo_source.hugoify_page))
   opts <- opts[-match("page", opts)]
@@ -101,6 +111,11 @@ gather_page_build_opts <- function(args_list){
   page_build_opts
 }
 
-validate_page_build_opts <- function(){
+validate_page_build_opts <- function(site_content){
+
+  # error if it isn't a hugoify_site_content object
+  if (!inherits(site_content, "hugoify_site_content")) {
+    stop("Object is not of class 'hugoify_site_content'.", call. = FALSE)
+  }
 
 }

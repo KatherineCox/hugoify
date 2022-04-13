@@ -8,13 +8,24 @@
 
 #### CONSTRUCTOR ####
 
-test_that("new_hugoify_site_content raises error for invalid page", {
+test_that("new_hugoify_site_content raises error if page is not a hugoify_page", {
 
-    # error for invalid page
+  # error if page is not a hugoify_page
   expect_error(new_hugoify_site_content(1), regexp="page must be a hugoify_page object")
   # no error for valid page
   p <- new_hugoify_page("my_page")
   expect_error(new_hugoify_site_content(p), regexp=NA)
+
+})
+
+test_that("new_hugoify_site_content raises error if build_opts is not a list", {
+
+  # error if build_opts is not a list
+  p <- new_hugoify_page("my_page")
+  expect_error(new_hugoify_site_content(p, 1), regexp="page_build_opts must be a list")
+  # no error if build_opts is a list
+  p <- new_hugoify_page("my_page")
+  expect_error(new_hugoify_site_content(p, list()), regexp=NA)
 
 })
 
@@ -57,6 +68,18 @@ test_that("new_hugoify_site_content makes an object with the correct fields", {
   expect_named(s, expected_names)
 })
 
+test_that("new_hugoify_site_content handles page", {
+
+  # no page should be an error (required arg)
+  expect_error(new_hugoify_site_content(), regexp = "missing, with no default")
+
+  # page should be passed along
+  p <- new_hugoify_page("my_page")
+  s <- new_hugoify_site_content(p)
+  expect_identical(s$page, p)
+
+})
+
 test_that("new_hugoify_site_content handles page_build_opts", {
 
   # no build_opts should have an empty build_opts list
@@ -64,23 +87,17 @@ test_that("new_hugoify_site_content handles page_build_opts", {
   s <- new_hugoify_site_content(p)
   expect_identical(s$page_build_opts, list())
 
-  # is_list_page is added
+  # build opts should be passed along
   p <- new_hugoify_page("my_page")
-  s <- new_hugoify_site_content(p, is_list_page=TRUE)
-  expect_type(s$page_build_opts, "list")
-  expect_identical(s$page_build_opts$is_list_page, TRUE)
-
-  # bundle is added
-  p <- new_hugoify_page("my_page")
-  s <- new_hugoify_site_content(p, bundle=FALSE)
-  expect_type(s$page_build_opts, "list")
-  expect_identical(s$page_build_opts$bundle, FALSE)
+  s <- new_hugoify_site_content(p, list(is_list_page=TRUE))
+  expect_identical(s$page_build_opts, list(is_list_page=TRUE))
 
 })
 
 test_that("new_hugoify_site_content handles children", {
 
   # new_hugoify_site just checks that they're the right class and adds them
+  # (does not do further validation)
   # so we just need to test that they got added
   child <- new_hugoify_page("child_page")
   child <- new_hugoify_site_content(child)
@@ -92,6 +109,8 @@ test_that("new_hugoify_site_content handles children", {
 
 
 #### VALIDATORS ####
+
+# Validate structure
 
 test_that("validate_hugoify_site_content raises error if not hugoify_site_content", {
   p <- new_hugoify_page("my_page")
@@ -124,11 +143,30 @@ test_that("validate_hugoify_site_content raises error for missing fields", {
 
 })
 
+# Validate page
+
 test_that("validate_hugoify_site_content validates page", {
   p <- new_hugoify_page("my_page")
   s <- new_hugoify_site_content(p)
   class(s$page) <- NULL # break the hugoify_page object by removing its class
   expect_error(validate_hugoify_site_content(s), regexp="not of class 'hugoify_page'")
+})
+
+# Validate build options
+# We have a helper function for this
+
+test_that("validate_page_build_opts raises error if not hugoify_site_content", {
+  p <- new_hugoify_page("my_page")
+  s <- new_hugoify_site_content(p)
+  class(s) <- NULL
+  expect_error(validate_hugoify_site_content(s), regexp="Object is not of class 'hugoify_site_content'")
+})
+
+test_that("validate_page_build_opts raises error for not bundling a list page", {
+  # p <- new_hugoify_page("my_page")
+  # b <- list(is_list_page=TRUE, bundle=FALSE)
+  # s <- new_hugoify_site_content(p, b)
+  # expect_error(validate_page_build_opts(s), regexp="fixme")
 })
 
 test_that("validate_hugoify_site_content validates page_build_opts", {
@@ -176,6 +214,60 @@ test_that("gather_page_build_opts returns a list with the expected items", {
   args_call <- call("build_hugo_source", page=p, is_list_page=TRUE)
   expect_identical(gather_page_build_opts(args_call),
                    list( is_list_page = TRUE) )
+
+})
+
+
+#### USER HELPER ####
+
+test_that("hugoify_site_content makes an object of class 'hugoify_site_content'", {
+  # this is basically just checking that the constructor is called
+  # tests for the structure of the object are handled in the constructor tests
+  p <- new_hugoify_page("my_page")
+  s <- hugoify_site_content(p)
+  expect_s3_class(s, "hugoify_site_content")
+})
+
+test_that("hugoify_site_content passes on page", {
+  p <- new_hugoify_page("my_page")
+  s <- hugoify_site_content(p)
+  expect_identical(s$page, p)
+})
+
+test_that("hugoify_site_content formats and passes on build_opts", {
+
+  # no build_opts should have an empty build_opts list
+  p <- new_hugoify_page("my_page")
+  s <- hugoify_site_content(p)
+  expect_identical(s$page_build_opts, list())
+
+  # is_list_page is added
+  p <- new_hugoify_page("my_page")
+  s <- hugoify_site_content(p, is_list_page=TRUE)
+  expect_identical(s$page_build_opts$is_list_page, TRUE)
+
+  # bundle is added
+  p <- new_hugoify_page("my_page")
+  s <- hugoify_site_content(p, bundle=FALSE)
+  expect_identical(s$page_build_opts$bundle, FALSE)
+
+  # TODO: other args are not added to build_opts
+  # (only necessary if there end up being other args to hugoify_site_content)
+
+})
+
+test_that("hugoify_site_content pass on children", {
+
+  # This is copied from the constructor
+  # TODO: Update it for the user helper
+  # # new_hugoify_site just checks that they're the right class and adds them
+  # # (does not do further validation)
+  # # so we just need to test that they got added
+  # child <- new_hugoify_page("child_page")
+  # child <- new_hugoify_site_content(child)
+  # p <- new_hugoify_page("parent")
+  # p <- new_hugoify_site_content(p, children=list(child))
+  # expect_identical(p$children[[1]], child)
 
 })
 
